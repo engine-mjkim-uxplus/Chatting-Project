@@ -53,11 +53,10 @@ public class TalkClient extends JFrame implements ActionListener {
 	Image back = null;
 	boolean is = true;
 	public Login view = null;
-	String user_Name;
 
 	public TalkClient(Login view) { // 파라미터로 view의 주소값을 넘겨 받는다
 		this.view = view; // 뷰에서 닉네임을 얻어오기 위해서...
-		this.user_Name = view.user_Name;
+		this.nickName = view.user_Name;
 		jtf_msg.addActionListener(this);
 		jbtn_change.addActionListener(this);
 		jbtn_exit.addActionListener(this);
@@ -126,7 +125,7 @@ public class TalkClient extends JFrame implements ActionListener {
 			ois = new ObjectInputStream(socket.getInputStream());
 			// initDisplay에서 닉네임이 결정된 후 init메소드가 호출되므로
 			// 서버에게 내가 입장한 사실을 알린다.(말하기)
-			oos.writeObject(100 + "#" + user_Name); // 100은 Integer객체이므로 ""안써도됨 #만 구분자로 ""붙인다
+			oos.writeObject(100 + "#" + nickName); // 100은 Integer객체이므로 ""안써도됨 #만 구분자로 ""붙인다
 			// 서버에 말을 한 후 들을 준비를 한다.
 			TalkClientThread tct = new TalkClientThread(this);
 			tct.start();
@@ -142,7 +141,7 @@ public class TalkClient extends JFrame implements ActionListener {
 		String msg = jtf_msg.getText(); // JTextField 즉 채팅내용 입력란 Enter이벤트
 		if (jtf_msg == obj) {
 			try {
-				oos.writeObject(201 + "#" + user_Name + "#" + msg);
+				oos.writeObject(201 + "#" + nickName + "#" + msg);
 				jtf_msg.setText("");
 
 			} catch (Exception e) {
@@ -150,7 +149,7 @@ public class TalkClient extends JFrame implements ActionListener {
 			}
 		} else if (jbtn_exit == obj) {
 			try {
-				oos.writeObject(500 + "#" + this.user_Name);
+				oos.writeObject(500 + "#" + this.nickName);
 				// 자바가상머신과 연결고리 끊기
 				System.exit(0);
 			} catch (Exception e) {
@@ -163,7 +162,7 @@ public class TalkClient extends JFrame implements ActionListener {
 				return;
 			}
 			try {
-				oos.writeObject(202 + "#" + user_Name + "#" + afterName + "#" + user_Name + "의 대화명이 " + afterName
+				oos.writeObject(202 + "#" + nickName + "#" + afterName + "#" + nickName + "의 대화명이 " + afterName
 						+ "으로 변경되었습니다.");
 			} catch (Exception e) {
 				// TODO: handle exception

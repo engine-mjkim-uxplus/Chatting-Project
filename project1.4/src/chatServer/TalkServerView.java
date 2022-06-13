@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-public class TalkServerView extends JFrame implements Runnable, ActionListener {
+public class TalkServerView extends JFrame implements ActionListener {
 	/////////////////////////////선언부////////////////////////////
 	private static final long serialVersionUID   = 		 1L;
 	ChatDao 		 		  dao  	  	 		 = 		null; // DB전담하여 쿼리문 질의하는 객체
@@ -59,6 +59,8 @@ public class TalkServerView extends JFrame implements Runnable, ActionListener {
 	DefaultTableModel 		  dtm 				 = 		new DefaultTableModel(data, cols);
 	JTable 					  jtb 				 =		new JTable(dtm);
 	JScrollPane 			  jsp				 = 		new JScrollPane(jtb);
+	SocketThread			  sk ;
+
 	/////////////////////////////생성자////////////////////////////
 	public TalkServerView() {
 		jbtn_notice.addActionListener(this); // 공지사항 이벤트
@@ -67,6 +69,9 @@ public class TalkServerView extends JFrame implements Runnable, ActionListener {
 		jbtn_user.addActionListener(this);
 		initDisplay(); 					 	 // 서버 UI
 		initDisplay2();						 // 접속현황 UI
+		// Runnable을 구현한 객체를 넘겨준다.
+		this. sk = new SocketThread(this);
+		sk.start();
 	}
 
 	public void initDisplay() {
@@ -116,61 +121,19 @@ public class TalkServerView extends JFrame implements Runnable, ActionListener {
 		frame2.setResizable(false); // 크기변경X
 	}
 
-	// 서버소켓과 클라이언트측 소켓을 연결하기
-	@Override
-	public void run() {
-		// 서버에 접속해온 클라이언트 쓰레드 정보를 관리할 벡터 생성하기
-		globalList = new Vector<>();
-		dao = new ChatDao(); // DB전담
-
-		try {
-			boolean isStop = false;
-			server = new ServerSocket(3002);
-			jta_log.append("사용자의 접속을 기다리는 중입니다:)\n");
-			while (!isStop) {
-				jtf_userCount.setText("현재 접속인원은 " + globalList.size() + "명 입니다.");
-				socket = server.accept();
-				jta_log.append("client info:" + socket + "\n"); // 사용자 정보를 찍음 (ip, port)등
-				TalkServerThread tst = new TalkServerThread(this); // 톡서버쓰레드 생성자에 자기자신이 들어간다.
-				tst.start(); // 톡서버 쓰레드 시작
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+	
+	// 뷰 실행 메인
 	public static void main(String[] args) {
-		TalkServer ts = new TalkServer();	
-		Thread th = new Thread(ts); // 화면 뛰운후 RUN을 구현한 톡서버 객체 쓰레드에 넣어줌
-		th.start(); // 접속을 받는 서버소켓 쓰레드 실행
+		TalkServerView ts	 = 		new TalkServerView();	
 	}
 
-	// 해당 날짜 출력 메소드
-	public String getDate() { // 변경
-		Calendar today = Calendar.getInstance();
-		int yyyy = today.get(Calendar.YEAR);
-		int mm = today.get(Calendar.MONTH) + 1;
-		int day = today.get(Calendar.DAY_OF_MONTH);
-		return yyyy + "-" + (mm < 10 ? "0" + mm : "" + mm) + "-" + (day < 10 ? "0" + day : " " + day + " ");
-
-	}
-
-	// 해당시간 출력 메소드
-	public String getTime() {
-		Calendar today = Calendar.getInstance();
-		int h = today.get(Calendar.HOUR_OF_DAY);
-		int m = today.get(Calendar.MINUTE);
-		String todayTime = (h < 10 ? "0" + h + "시 " : "" + h + "시 ") + (m < 10 ? "0" + m + "분" : "" + m + "분");
-
-		return todayTime;
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		// 로그저장 액션
 		if (obj == jbtn_log) {
-			String fileName = "log_" + getDate() + ".txt";
+			String fileName = "log_" + sk.getDate() + ".txt";
 			System.out.println(fileName);// log_2020-03-13.txt
 			try {
 				File f = new File(logPath + fileName); // 경로 + 파일이름

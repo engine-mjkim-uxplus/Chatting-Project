@@ -103,7 +103,7 @@ public class TalkClientThread extends Thread {
 				// 운영자에 의해 강제퇴장 당했을 경우
 				case 501: {
 					String nickName = st.nextToken();
-					if (tc.user_Name.equals(nickName)) { // 같은 닉네임이면 종료
+					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
 						for (int i = 0; i < tc.dtm.getRowCount(); i++) {
 							String n = (String) tc.dtm.getValueAt(i, 0);
 						}
