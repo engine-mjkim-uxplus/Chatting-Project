@@ -12,15 +12,15 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 
 public class TalkServerThread extends Thread {
-	SocketThread   		  sk	 		= null;
-	TalkServerView       view           = null;
-	Socket 				client 			= null;
-	ObjectOutputStream   oos   			= null; 
-	ObjectInputStream    ois    		= null; 
-	String 			   chatName 		= null; // 현재 서버에 접속한 클라이언트 스레드 닉네임 저장
+	SocketThread   		  sk	 			= null;
+	TalkServerView        view          	= null;
+	Socket 				  client 			= null;
+	ObjectOutputStream    oos   			= null; 
+	ObjectInputStream     ois    			= null; 
+	String 			      chatName 			= null; // 현재 서버에 접속한 클라이언트 스레드 닉네임 저장
 
 	public TalkServerThread(SocketThread sk) {
-		this.sk = sk;			 // 소켓쓰레드 주소값
+		this.sk 	= sk;			 // 소켓쓰레드 주소값
 		this.client = sk.socket; // 방금 접속한 클라이언트의 정보(ip,port)
 		this.view   = sk.view;
 		try {
@@ -77,7 +77,7 @@ public class TalkServerThread extends Thread {
 		try {
 			// while(true) {//무한루프에 빠질 수 있다.
 			run_start: while (!isStop) { // 클라이언트의 말 들을 준비중...
-
+				System.out.println("반복하고 있니"); // 테스트
 				msg = (String) ois.readObject(); // 사용자에게 입력 받을 때 까지 기다린다.
 				view.jta_log.append(msg + "\n");
 				view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
@@ -99,7 +99,7 @@ public class TalkServerThread extends Thread {
 							+ "#" + nickName + "#" + message);
 					String days = sk.getDate();
 					String hours = sk.getTime();
-					view.dao.chatMsg(message, nickName, days, hours); // 대화내용 DB 테이블에 기록하기( 테스트중.... )
+					sk.dao.chatMsg(message, nickName, days, hours); // 대화내용 DB 테이블에 기록하기( 테스트중.... )
 				}
 					break;
 				case 202: { // 프로토콜 202면 대화명 변경 및 단체로 전달
@@ -123,7 +123,7 @@ public class TalkServerThread extends Thread {
 						}
 					}
 				}
-					break run_start;
+				break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료
 				}///////////// end of switch
 			} ///////////////// end of while
 		} catch (Exception e) {

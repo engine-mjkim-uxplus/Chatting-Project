@@ -125,7 +125,7 @@ public class TalkClient extends JFrame implements ActionListener {
 			ois = new ObjectInputStream(socket.getInputStream());
 			// initDisplay에서 닉네임이 결정된 후 init메소드가 호출되므로
 			// 서버에게 내가 입장한 사실을 알린다.(말하기)
-			oos.writeObject(100 + "#" + nickName); // 100은 Integer객체이므로 ""안써도됨 #만 구분자로 ""붙인다
+			oos.writeObject(100 + "#" + nickName);
 			// 서버에 말을 한 후 들을 준비를 한다.
 			TalkClientThread tct = new TalkClientThread(this);
 			tct.start();
@@ -140,6 +140,7 @@ public class TalkClient extends JFrame implements ActionListener {
 		Object obj = ae.getSource();
 		String msg = jtf_msg.getText(); // JTextField 즉 채팅내용 입력란 Enter이벤트
 		if (jtf_msg == obj) {
+			System.out.println("채팅 친거야");
 			try {
 				oos.writeObject(201 + "#" + nickName + "#" + msg);
 				jtf_msg.setText("");

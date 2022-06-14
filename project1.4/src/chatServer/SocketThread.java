@@ -8,12 +8,12 @@ import java.util.Vector;
 
 // 뷰 실행 후 사용자 접속 받는 쓰레드
 public class SocketThread extends Thread {
-	ChatDao 		 		 dao 			= 		null; // DB전담하여 쿼리문 질의하는 객체
-	TalkServerThread 		 tst 			= 		null; // 각 클라이언트의 통신담당하는 쓰레드1
-	List<TalkServerThread> globalList 		= 		null; // 각 클라이언트의 정보를 받음 (vector로 구현)
+	ChatDao 		 		dao 			= 		null; // DB전담하여 쿼리문 질의하는 객체
+	TalkServerThread 		tst 			= 		null; // 각 클라이언트의 통신담당하는 쓰레드1
+	List<TalkServerThread> 	globalList 		= 		null; // 각 클라이언트의 정보를 받음 (vector로 구현)
 	ServerSocket 			server 			= 		null; // ip와 port 바인드하여 클라이언트 접속을 받는 객체
 	Socket 					socket 			= 		null; // 클라이언트와 연결 되면 얻어지는 객체
-	TalkServerView 			 view			= 		null;
+	TalkServerView 			view			= 		null;
 	
 	public SocketThread(TalkServerView view){
 		this.view = view;	
@@ -41,7 +41,7 @@ public class SocketThread extends Thread {
 	}
 	
 	// 해당 날짜 출력 메소드
-	public String getDate() { // 변경
+	public String getDate() { //변경
 		Calendar today = Calendar.getInstance();
 		int yyyy = today.get(Calendar.YEAR);
 		int mm = today.get(Calendar.MONTH) + 1;

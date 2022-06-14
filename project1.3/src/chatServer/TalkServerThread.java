@@ -77,7 +77,7 @@ public class TalkServerThread extends Thread {
 		try {
 			// while(true) {//무한루프에 빠질 수 있다.
 			run_start: while (!isStop) { // 클라이언트의 말 들을 준비중...
-
+				System.out.println("반복하고 있니");
 				msg = (String) ois.readObject(); // 사용자에게 입력 받을 때 까지 기다린다.
 				ts.jta_log.append(msg + "\n");
 				ts.jta_log.setCaretPosition(ts.jta_log.getDocument().getLength());

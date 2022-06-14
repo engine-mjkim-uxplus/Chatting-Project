@@ -33,9 +33,6 @@ public class TalkServerView extends JFrame implements ActionListener {
 	private static final long serialVersionUID   = 		 1L;
 	ChatDao 		 		  dao  	  	 		 = 		null; // DB전담하여 쿼리문 질의하는 객체
 	TalkServerThread 		  tst 	  	 		 = 		null; // 각 클라이언트의 통신담당하는 쓰레드1
-	List<TalkServerThread> globalList 	 		 = 		null; // 각 클라이언트의 정보를 받음 (vector로 구현)
-	ServerSocket 			 server		 	 	 = 		null; // ip와 port 바인드하여 클라이언트 접속을 받는 객체
-	Socket 					 socket 	 		 = 		null; // 클라이언트와 연결 되면 얻어지는 객체
 	JTextArea 				jta_log 	 	 	 = 		new JTextArea(10, 30); //
 	JTextField 			 jtf_userCount 	 		 = 		new JTextField(); // 접속자 수 표시
 	JScrollPane 			jsp_log 	 		 = 		new JScrollPane(jta_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -45,7 +42,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 	JButton 			  jbtn_notice 	 	 	 = 		new JButton("공지사항 알림");
 	JButton 			    jbtn_memSearch 		 = 		new JButton("회원조회");
 	JButton 				jbtn_user		 	 = 		new JButton("접속인원");
-	Font 					   font;
+	Font 					font;
 	Vector<Object> 				v 				 = 		new Vector<>(); // 각 사용자 닉네임, ip, 시간 담는 백터
 	String 					logPath				 = 		"./txt/";
 
@@ -107,12 +104,12 @@ public class TalkServerView extends JFrame implements ActionListener {
 	public void initDisplay2() {
 		jbtn_expulsion.addActionListener(this);
 		jbtn_expulsion.setFont(font);
-		jp_south2.add(jbtn_expulsion);
-		
+		jp_south2.add(jbtn_expulsion);	
 		frame2.add("Center", jsp);
 		frame2.add("South", jp_south2);
 		frame2.setSize(500, 500);
 		frame2.setVisible(true);
+		
 		jbtn_expulsion.addActionListener(this);
 		jp.setLayout(new BorderLayout());
 		jp_south2.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -124,13 +121,13 @@ public class TalkServerView extends JFrame implements ActionListener {
 	
 	// 뷰 실행 메인
 	public static void main(String[] args) {
-		TalkServerView ts	 = 		new TalkServerView();	
+		TalkServerView ts  = new TalkServerView();	
 	}
-
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
+		
 		// 로그저장 액션
 		if (obj == jbtn_log) {
 			String fileName = "log_" + sk.getDate() + ".txt";
@@ -151,10 +148,10 @@ public class TalkServerView extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(this, "메시지는 공백일 수 없습니다. 다시 입력하세요", "INFO",
 						JOptionPane.INFORMATION_MESSAGE);
 				return;
-			} else if (globalList.size() != 0) {
-				for (TalkServerThread tst : globalList)
+			} else if (sk.globalList.size() != 0) {
+				for (TalkServerThread tst : sk.globalList)
 					tst.send(203 + "#" + "운영자" + "#" + notice);
-			} else if (notice != null && globalList.size() == 0) {
+			} else if (notice != null && sk.globalList.size() == 0) {
 				JOptionPane.showMessageDialog(this, "현재 접속중인 사용자가 없습니다", "INFO", JOptionPane.INFORMATION_MESSAGE);
 			}
 
@@ -170,17 +167,17 @@ public class TalkServerView extends JFrame implements ActionListener {
 		
 		// 클라이언트 강퇴 이벤트
 		if (obj == jbtn_expulsion) {
-			if (globalList.size() != 0) {
+			if (sk.globalList.size() != 0) {
 				int select = jtb.getSelectedRow();
 				String n = (String) dtm.getValueAt(select, 0);
-				for (TalkServerThread tst : globalList) {
+				for (TalkServerThread tst : sk.globalList) {
 					if (n.equals(tst.chatName)) {
 						String msg = "501#" + tst.chatName;
 						StringTokenizer st = new StringTokenizer(msg, "#");
 						tst.broadCasting(msg);
 						// tst.send(msg); // 강퇴메시지
 						dtm.removeRow(select);
-						globalList.remove(tst);
+						sk.globalList.remove(tst);
 						break;
 						// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것
 						

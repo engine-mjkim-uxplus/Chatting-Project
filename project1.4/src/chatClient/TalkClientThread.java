@@ -81,8 +81,6 @@ public class TalkClientThread extends Thread {
 					String nickName = st.nextToken();
 					String notice = st.nextToken();
 					String n = "[" + nickName + "]" + notice;
-//					tc.jta_display.append("[" + nickName + "]" + notice + "\n"); // 채팅창에 찍기
-					// tc.jta_display.setForeground(Color.red); // 색상변경 (테스트중..) 구글링에서 안된다고함..
 					tc.jta_display.setCaretPosition(tc.jta_display.getDocument().getLength());
 					tc.showmsg_Info(n); 
 				}
