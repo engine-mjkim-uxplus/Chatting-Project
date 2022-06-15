@@ -9,11 +9,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Calendar;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -30,34 +27,34 @@ import javax.swing.table.DefaultTableModel;
 
 public class TalkServerView extends JFrame implements ActionListener {
 	/////////////////////////////선언부////////////////////////////
-	private static final long serialVersionUID   = 		 1L;
-	ChatDao 		 		  dao  	  	 		 = 		null; // DB전담하여 쿼리문 질의하는 객체
-	TalkServerThread 		  tst 	  	 		 = 		null; // 각 클라이언트의 통신담당하는 쓰레드1
-	JTextArea 				jta_log 	 	 	 = 		new JTextArea(10, 30); //
-	JTextField 			 jtf_userCount 	 		 = 		new JTextField(); // 접속자 수 표시
-	JScrollPane 			jsp_log 	 		 = 		new JScrollPane(jta_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	private static final long serialVersionUID       = 		 1L;
+	ChatDao 		 		  dao  	  	 		     = 		null; // DB전담하여 쿼리문 질의하는 객체
+	TalkServerThread 		  tst 	  	 		     = 		null; // 각 클라이언트의 통신담당하는 쓰레드1
+	JTextArea 				  jta_log 	 	 	     = 		new JTextArea(10, 30); //
+	JTextField 			      jtf_userCount 	     = 		new JTextField(); // 접속자 수 표시
+	JScrollPane 			  jsp_log 	 			 = 		new JScrollPane(jta_log, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 																JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	JPanel 				    jp_south 	 	 	 = 		new JPanel();
-	JButton 			    jbtn_log 	 	 	 = 		new JButton("로그저장");
-	JButton 			  jbtn_notice 	 	 	 = 		new JButton("공지사항 알림");
-	JButton 			    jbtn_memSearch 		 = 		new JButton("회원조회");
-	JButton 				jbtn_user		 	 = 		new JButton("접속인원");
-	Font 					font;
-	Vector<Object> 				v 				 = 		new Vector<>(); // 각 사용자 닉네임, ip, 시간 담는 백터
-	String 					logPath				 = 		"./txt/";
+	JPanel 				      jp_south 	 	 		 = 		new JPanel();
+	JButton 			      jbtn_log 	 	 	 	 = 		new JButton("로그저장");
+	JButton 			      jbtn_notice 	 	 	 = 		new JButton("공지사항 알림");
+	JButton 			      jbtn_memSearch 		 = 		new JButton("회원조회");
+	JButton 				  jbtn_user		 		 = 		new JButton("접속인원");
+	Font 					  font;
+	Vector<Object> 			  v 					 = 		new Vector<>(); // 각 사용자 닉네임, ip, 시간 담는 백터
+	String 					  logPath				 = 		"./txt/";
 
 	////////////////// 현재 접속 인원 관리 ///////////////////////////
-	JFrame 					 frame2 			 = 		new JFrame("현재 접속인원");
-	JButton 			  jbtn_expulsion		 =      new JButton("클라이언트 접속끊기");
-	JPanel 					  jp 				 = 		new JPanel();
-	JPanel 				    jp_south2 			 = 		new JPanel();
-	String 					 cols[]			     = 		{ "접속 닉네임", "IP", "접속시간" }; // 컬럼네임. cols= 컬럼명
-	String 					 data[][]			 = 		new String[0][3];
-	DefaultTableModel 		  dtm 				 = 		new DefaultTableModel(data, cols);
-	JTable 					  jtb 				 =		new JTable(dtm);
-	JScrollPane 			  jsp				 = 		new JScrollPane(jtb);
+	JFrame 					  frame2 			 	 = 		new JFrame("현재 접속인원");
+	JButton 			      jbtn_expulsion		 =      new JButton("클라이언트 접속끊기");
+	JPanel 					  jp 				     = 		new JPanel();
+	JPanel 				      jp_south2 			 = 		new JPanel();
+	String 					  cols[]			     = 		{ "접속 닉네임", "IP", "접속시간" }; // 컬럼네임. cols= 컬럼명
+	String 					  data[][]			 	 = 		new String[0][3];
+	DefaultTableModel 		  dtm 				     = 		new DefaultTableModel(data, cols);
+	JTable 					  jtb 				     =		new JTable(dtm);
+	JScrollPane 			  jsp				     = 		new JScrollPane(jtb);
 	SocketThread			  sk ;
-
+	
 	/////////////////////////////생성자////////////////////////////
 	public TalkServerView() {
 		jbtn_notice.addActionListener(this); // 공지사항 이벤트
@@ -65,9 +62,9 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jbtn_memSearch.addActionListener(this);
 		jbtn_user.addActionListener(this);
 		initDisplay(); 					 	 // 서버 UI
-		initDisplay2();						 // 접속현황 UI
 		// Runnable을 구현한 객체를 넘겨준다.
 		this. sk = new SocketThread(this);
+		jbtn_expulsion.addActionListener(this);
 		sk.start();
 	}
 
@@ -77,7 +74,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jp_south.setLayout(new FlowLayout(FlowLayout.CENTER)); // 각 컴포넌트의 크기 동일하게 센터에 나오도록 배치
 		// jta_log.setBackground(Color.orange);
 		// 각 컴포넌트의 폰트 설정
-		font = new Font("나눔고딕", Font.BOLD, 15); // 폰트사용
+		font = new Font("고딕", Font.BOLD, 15); // 폰트사용
 		jta_log.setFont(font);
 		jbtn_log.setFont(font);
 		jbtn_notice.setFont(font);
@@ -89,7 +86,6 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jp_south.add(jbtn_notice); // 알림버튼 추가
 		jp_south.add(jbtn_memSearch); // 회원조회
 		jp_south.add(jbtn_user); // 현재 접속인원
-
 		this.add("South", jp_south);
 		this.add("Center", jsp_log);
 		this.add("North", jtf_userCount);
@@ -110,12 +106,13 @@ public class TalkServerView extends JFrame implements ActionListener {
 		frame2.setSize(500, 500);
 		frame2.setVisible(true);
 		
-		jbtn_expulsion.addActionListener(this);
+		
 		jp.setLayout(new BorderLayout());
 		jp_south2.setLayout(new FlowLayout(FlowLayout.CENTER));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jtb.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 한개의 로우만 선택가능
 		frame2.setResizable(false); // 크기변경X
+
 	}
 
 	
@@ -159,31 +156,42 @@ public class TalkServerView extends JFrame implements ActionListener {
 		// 회원조회 이벤트
 		if(obj == jbtn_memSearch) {
 			System.out.println("회원조회 클릭됨");
+			
 		}
-		
+		// 접속인원 관리 이벤트
 		if(obj == jbtn_user) {
-			initDisplay2();
-		}
-		
-		// 클라이언트 강퇴 이벤트
+			initDisplay2();	
+			while(dtm.getRowCount() > 0) {
+			dtm.removeRow(0);
+			}
+			if(sk.globalList.size() > 0) {
+			for(TalkServerThread tst : sk.globalList) {
+				dtm.addRow(tst.oneRow);
+				}
+			}
+
+		}	
+		// 클라이언트 강퇴 이벤트 (프로토콜 501)
 		if (obj == jbtn_expulsion) {
-			if (sk.globalList.size() != 0) {
+			if (sk.globalList.size() != 0 && jtb.getSelectedRow() > -1) {
 				int select = jtb.getSelectedRow();
 				String n = (String) dtm.getValueAt(select, 0);
 				for (TalkServerThread tst : sk.globalList) {
 					if (n.equals(tst.chatName)) {
 						String msg = "501#" + tst.chatName;
-						StringTokenizer st = new StringTokenizer(msg, "#");
-						tst.broadCasting(msg);
-						// tst.send(msg); // 강퇴메시지
-						dtm.removeRow(select);
+						tst.broadCasting(msg); // 강퇴메시지
 						sk.globalList.remove(tst);
+//						dtm.removeRow(select); // indexbounds 문제...
+						System.out.println(dtm.getRowCount());// 테스트
+						System.out.println(sk.globalList.size());
 						break;
-						// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것
-						
+						// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것	
 					}
-				}
-			}
+				}		
+					
+			} 
+				
+			
 		}
 
 	}

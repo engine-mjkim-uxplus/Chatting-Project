@@ -1,15 +1,12 @@
 package chatServer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import javax.swing.JOptionPane;
+
 
 public class TalkServerThread extends Thread {
 	SocketThread   		  sk	 			= null;
@@ -18,7 +15,7 @@ public class TalkServerThread extends Thread {
 	ObjectOutputStream    oos   			= null; 
 	ObjectInputStream     ois    			= null; 
 	String 			      chatName 			= null; // 현재 서버에 접속한 클라이언트 스레드 닉네임 저장
-
+	Vector<Object>		  oneRow			= null;
 	public TalkServerThread(SocketThread sk) {
 		this.sk 	= sk;			 // 소켓쓰레드 주소값
 		this.client = sk.socket; // 방금 접속한 클라이언트의 정보(ip,port)
@@ -29,7 +26,7 @@ public class TalkServerThread extends Thread {
 			String msg = (String) ois.readObject(); // 사용자 nickName(JoptionPane) 읽어들임
 			// ts.jta_log.append(msg + "\n"); // jta_log는 서버의 ui에 TextArea부분에 msg붙인다.
 			StringTokenizer st = new StringTokenizer(msg, "#"); // ( msg = 100#nickName임 )
-			st.nextToken(); // msg = 100#nickName에서 100을 읽어들인다.
+			st.nextToken(); 		   // msg = 100#nickName에서 100을 읽어들인다.
 			chatName = st.nextToken(); // msg에 남은 #nicKname에서 구분자 #을 빼고 nickName을 읽어들인다
 			view.jta_log.append(chatName + "님이 입장하였습니다.\n"); // 서버에 찍음
 			// 이전에 입장해 있는 친구들 정보 받아내기 ------------해야할 것
@@ -37,21 +34,24 @@ public class TalkServerThread extends Thread {
 				// String currentName = tst.chatName;
 				this.send(100 + "#" + tst.chatName); // ※※※이전 참여자의 정보를 가져오는 부분 ※※※
 			}									     // 방금 접속한 사용자에게 이전 접속자들 접속했다고 화면에 뛰운다
-			// 서버 dtm에 현재 접속인원 찍기
-			if (view.dtm != null) {
-				view.v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
-				view.v.add((String) chatName);
-				view.v.add(client.getInetAddress());
-				view.v.add((String) (sk.getDate() + sk.getTime()));
-				view.dtm.addRow(view.v);
-			}
+			InetAddress ip = client.getInetAddress();
+			String time    = sk.getDate() + sk.getTime();
+			oneRow  = new Vector<>();
+			oneRow.add(chatName);
+			oneRow.add(ip);
+			oneRow.add(time);
+			view.dtm.addRow(oneRow);
+			
+			sk.globalList.add(this);					
+			
 			// 현재 서버에 입장한 클라이언트 스레드 추가하기
-			sk.globalList.add(this); // 입장한 각 클라이언트 쓰레드를 백터에 담는다
+			// sk.globalList.add(this); // 입장한 각 클라이언트 쓰레드를 백터에 담는다
 			this.broadCasting(msg); // ※※※ 현재접속자를 포함한 각 클라이언트 쓰레드에게 접속하였다고 여기서 전달 ※※※
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 	}
+		
 
 	// 현재 입장해 있는 친구들 모두에게 메시지 전송하기 구현
 	public void broadCasting(String msg) {
