@@ -25,7 +25,6 @@ import javax.swing.table.DefaultTableModel;
 public class TalkServerView extends JFrame implements ActionListener {
 	/////////////////////////////선언부////////////////////////////
 	private static final long serialVersionUID       = 		 1L;
-	ChatDao 		 		  dao  	  	 		     = 		null; // DB전담하여 쿼리문 질의하는 객체
 	TalkServerThread 		  tst 	  	 		     = 		null; // 각 클라이언트의 통신담당하는 쓰레드1
 	JTextArea 				  jta_log 	 	 	     = 		new JTextArea(10, 30); //
 	JTextField 			      jtf_userCount 	     = 		new JTextField(); // 접속자 수 표시
@@ -142,7 +141,9 @@ public class TalkServerView extends JFrame implements ActionListener {
 				return;
 			} else if (sk.globalList.size() != 0) {
 				for (TalkServerThread tst : sk.globalList)
-					tst.send(203 + "#" + "운영자" + "#" + notice);
+					tst.send(Protocol.NOTICE 
+							+Protocol.seperator + "운영자"
+							+Protocol.seperator + notice);
 			} else if (notice != null && sk.globalList.size() == 0) {
 				JOptionPane.showMessageDialog(this, "현재 접속중인 사용자가 없습니다", "INFO", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -172,18 +173,18 @@ public class TalkServerView extends JFrame implements ActionListener {
 				int select = jtb.getSelectedRow();
 				String n = (String) dtm.getValueAt(select, 0);
 				for (TalkServerThread tst : sk.globalList) {
-					if (n.equals(tst.chatName)) {
-						String msg = "501#" + tst.chatName;
+					if (n.equals(tst.nickName)) {
+						String msg = Protocol.EXPULSION
+									+Protocol.seperator + tst.nickName;
 						tst.broadCasting(msg); // 강퇴메시지
 						sk.globalList.remove(tst);
-						dtm.removeRow(select); 
-						System.out.println(dtm.getRowCount());// 테스트
-						System.out.println(sk.globalList.size());
+						dtm.removeRow(select);
+						jta_log.append(tst.nickName + "님을 강퇴하였습니다.\n");
+						jtf_userCount.setText("현재 접속인원은 " + sk.globalList.size() + "명 입니다.");		
 						break;
 					// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것	
 					}
 				}		
-					
 			} 
 				
 			
