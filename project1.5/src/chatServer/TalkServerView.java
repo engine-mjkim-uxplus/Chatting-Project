@@ -59,7 +59,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jbtn_user.addActionListener(this);
 		initDisplay(); 					 	 // 서버 UI
 		// Runnable을 구현한 객체를 넘겨준다.
-		this. sk = new SocketThread(this);
+		this.sk = new SocketThread(this);
 		jbtn_expulsion.addActionListener(this);
 		sk.start();
 	}
@@ -112,7 +112,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 
 	// 뷰 실행 메인
 	public static void main(String[] args) {
-		TalkServerView ts  = new TalkServerView();	
+		TalkServerView view  = new TalkServerView();	
 	}
 
 	@Override
@@ -171,20 +171,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 		if (obj == jbtn_expulsion) {
 			if (sk.globalList.size() != 0 && jtb.getSelectedRow() > -1) {
 				int select = jtb.getSelectedRow();
-				String n = (String) dtm.getValueAt(select, 0);
-				for (TalkServerThread tst : sk.globalList) {
-					if (n.equals(tst.nickName)) {
-						String msg = Protocol.EXPULSION
-									+Protocol.seperator + tst.nickName;
-						tst.broadCasting(msg); // 강퇴메시지
-						sk.globalList.remove(tst);
-						dtm.removeRow(select);
-						jta_log.append(tst.nickName + "님을 강퇴하였습니다.\n");
-						jtf_userCount.setText("현재 접속인원은 " + sk.globalList.size() + "명 입니다.");		
-						break;
-					// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것	
-					}
-				}		
+				sk.expulsion(select);	
 			} 
 				
 			

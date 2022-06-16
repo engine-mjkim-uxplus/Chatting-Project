@@ -126,7 +126,8 @@ public class TalkServerThread extends Thread {
 							}
 						}
 					}
-					view.jtf_userCount.setText("현재 접속인원은 " + sk.globalList.size() + "명 입니다.");
+					sk.userCount();
+//					view.jtf_userCount.setText("현재 접속인원은 " + sk.globalList.size() + "명 입니다.");
 				}
 				break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료
 				}///////////// end of switch
