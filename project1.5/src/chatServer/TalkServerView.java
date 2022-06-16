@@ -57,10 +57,9 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jbtn_log.addActionListener(this); 	 // 로그저장 이벤트
 		jbtn_memSearch.addActionListener(this);
 		jbtn_user.addActionListener(this);
-		initDisplay(); 					 	 // 서버 UI
-		// Runnable을 구현한 객체를 넘겨준다.
-		this.sk = new SocketThread(this);
 		jbtn_expulsion.addActionListener(this);
+		initDisplay(); 					 	 // 서버 UI
+		this.sk = new SocketThread(this);
 		sk.start();
 	}
 
@@ -99,7 +98,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 		jp_south2.add(jbtn_expulsion);	
 		frame2.add("Center", jsp);
 		frame2.add("South", jp_south2);
-		frame2.setSize(500, 500);
+		frame2.setSize(600, 500);
 		frame2.setVisible(true);
 		
 		jp.setLayout(new BorderLayout());
@@ -114,40 +113,19 @@ public class TalkServerView extends JFrame implements ActionListener {
 	public static void main(String[] args) {
 		TalkServerView view  = new TalkServerView();	
 	}
-
+	// 이벤트처리는 SocketThread에서 컨트롤러 역할하여 뷰에대한 이벤트 처리한다.
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		
 		// 로그저장 액션
 		if (obj == jbtn_log) {
-			String fileName = "log_" + sk.getDate() + ".txt";
-			System.out.println(fileName);// log_2020-03-13.txt
-			try {
-				File f = new File(logPath + fileName); // 경로 + 파일이름
-				PrintWriter pw = new PrintWriter(new BufferedWriter(// 필터클래스-카메라 필터
-						new FileWriter(f.getAbsolutePath())));
-				pw.write(jta_log.getText());
-				pw.close();// 사용한 입출력 클래스는 반드시 닫아줌.
-			} catch (Exception e2) {
-				System.out.println(e2.toString());
-			}
-			// 서버에서 공지사항 알림 (프로토콜 203 )
-		} else if (obj == jbtn_notice) {
-			String notice = JOptionPane.showInputDialog("공지사항을 입력하세요.");
-			if (notice == null || notice.trim().length() < 1) {
-				JOptionPane.showMessageDialog(this, "메시지는 공백일 수 없습니다. 다시 입력하세요", "INFO",
-						JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else if (sk.globalList.size() != 0) {
-				for (TalkServerThread tst : sk.globalList)
-					tst.send(Protocol.NOTICE 
-							+Protocol.seperator + "운영자"
-							+Protocol.seperator + notice);
-			} else if (notice != null && sk.globalList.size() == 0) {
-				JOptionPane.showMessageDialog(this, "현재 접속중인 사용자가 없습니다", "INFO", JOptionPane.INFORMATION_MESSAGE);
-			}
+			sk.log();
 
+		// 공지사항 알림 이벤트
+		} else if (obj == jbtn_notice) {
+			String notice_msg = JOptionPane.showInputDialog("공지사항을 입력하세요.");
+			sk.notice(notice_msg);
 		}
 		// 회원조회 이벤트
 		if(obj == jbtn_memSearch) {
@@ -157,14 +135,7 @@ public class TalkServerView extends JFrame implements ActionListener {
 		// 접속인원 관리 이벤트
 		if(obj == jbtn_user) {
 			initDisplay2();
-			if(sk.globalList.size() > 0) {
-				while(dtm.getRowCount() > 0) {
-					dtm.removeRow(0);
-				}
-				for(TalkServerThread tst : sk.globalList) {
-					dtm.addRow(tst.oneRow);
-				}
-			}
+			sk.showNumber_Conpeople();
 
 		}	
 		// 클라이언트 강퇴 이벤트 (프로토콜 501)
