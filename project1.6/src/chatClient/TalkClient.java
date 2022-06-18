@@ -130,7 +130,7 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 			// 서버에게 내가 입장한 사실을 알린다.(말하기)
 			MsgVO mvo = new MsgVO();
 			mvo.setProtocol(Protocol.ADMISSION);
-			mvo.setMsg(nickName);
+			mvo.setNickname(nickName);
 			oos.writeObject(mvo);
 			// 서버에 말을 한 후 들을 준비를 한다.
 			TalkClientThread tct = new TalkClientThread(this);
@@ -149,23 +149,25 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 		if (jtf_msg == obj) {
 			System.out.println("채팅 친거야");
 			try {
-				mvo.setNickname(nickName);   			 // 테스트중
-				mvo.setMsg(msg); 						 // 테스트중
-				mvo.setProtocol(Protocol.GROUP_MESSAGE); // 테스트중
-				oos.writeObject(mvo);  					 // 테스트중
-				oos.writeObject(201 + "#" + nickName + "#" + msg);
+				mvo.setNickname(nickName);   			
+				mvo.setMsg(msg); 						 
+				mvo.setProtocol(Protocol.GROUP_MESSAGE); 
+				oos.writeObject(mvo);  					 
 				jtf_msg.setText("");
 
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.toString();
 			}
 		} else if (jbtn_exit == obj) {
 			try {
-				oos.writeObject(500 + "#" + this.nickName);
+				mvo.setProtocol(Protocol.ROOM_OUT);
+				mvo.setNickname(nickName);
+				mvo.setMsg(nickName + "님이 퇴장하였습니다.");
+				oos.writeObject(mvo);
 				// 자바가상머신과 연결고리 끊기
 				System.exit(0);
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 		} else if (jbtn_change == obj) {
 			String afterName = JOptionPane.showInputDialog("변경할 대화명을 입력하세요.");
@@ -174,10 +176,13 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 				return;
 			}
 			try {
-				oos.writeObject(202 + "#" + nickName + "#" + afterName + "#" + nickName + "의 대화명이 " + afterName
-						+ "으로 변경되었습니다.");
+				mvo.setProtocol(Protocol.NICNAME_CHANGE);
+				mvo.setNickname(nickName);
+				mvo.setAfter_nickname(afterName);
+				mvo.setMsg(nickName + "님의 대화명이 " + afterName + "으로 변경되었습니다");
+				oos.writeObject(mvo);
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 		}
 	}////////////////////// end of actionPerformed
