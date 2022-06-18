@@ -67,17 +67,19 @@ public class TalkServerThread extends Thread {
 	// 클라이언트가 말하는 것을 듣는 역할. TalkClient가 말한 것을 듣고 TalkClientThread에게 보내는 역할
 	public void run() {
 		MsgVO mvo = new MsgVO();
-		String msg = null;
 		boolean isStop = false;
+		int protocol = 0;
 		try {
 			run_start: while (!isStop) { 
 				mvo = (MsgVO) ois.readObject(); // 사용자에게 입력 받을 때 까지 기다린다.
-				view.jta_log.append(mvo.getMsg() + "\n");
-				view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
-				int protocol = 0;
-				
+				String msg = mvo.getMsg();
+				if(msg != null) {
+					view.jta_log.append("[" + this.nickName +"] " + msg + "\n");
+					view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
+				}				
+				protocol = mvo.getProtocol();// 100 | 200 | 300 | 400 | 500
+					
 				if (mvo.getMsg() != null) {
-					protocol = mvo.getProtocol();// 100 | 200 | 300 | 400 | 500
 				}
 				// 개인 대화 전달
 				switch (protocol) {
@@ -87,8 +89,8 @@ public class TalkServerThread extends Thread {
 					break;
 				// 단체 대화 전달
 				case Protocol.GROUP_MESSAGE: { // 채팅보냈을 때 (DB에 대화내용 저장)
-					String nickName = mvo.getNickname();
 					String message = mvo.getMsg();
+					String nickName = mvo.getNickname();
 					String days = sk.getDate();
 					String hours = sk.getTime();
 					broadCasting(mvo);
@@ -98,16 +100,12 @@ public class TalkServerThread extends Thread {
 					break;
 				// 대화명 변경에 대해 단체로 전달
 				case Protocol.NICNAME_CHANGE: {
-					String nickName = mvo.getNickname();
-					String afterName = mvo.getAfter_nickname();
-					String message = mvo.getMsg();
-					this.nickName = afterName;
+					this.nickName = mvo.getAfter_nickname();
 					broadCasting(mvo);
 				}
 					break;
 				// 클라이언트 퇴장 시
 				case Protocol.ROOM_OUT: { 
-					String nickName = mvo.getNickname();
 					sk.globalList.remove(this); // 클라이언트 나갔으므로 통신 쓰레드 지움
 					broadCasting(mvo);
 					sk. showNumber_Conpeople();

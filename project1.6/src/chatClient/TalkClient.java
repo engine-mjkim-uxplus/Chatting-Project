@@ -176,11 +176,11 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 				return;
 			}
 			try {
-//				mvo.setProtocol(Protocol.NICNAME_CHANGE);
-//				mvo.setNickname(nickName);
-//				mvo.setAfter_nickname(afterName);
-				oos.writeObject(202 + "#" + nickName + "#" + afterName + "#" + nickName + "의 대화명이 " + afterName
-						+ "으로 변경되었습니다.");
+				mvo.setProtocol(Protocol.NICNAME_CHANGE);
+				mvo.setNickname(nickName);
+				mvo.setAfter_nickname(afterName);
+				mvo.setMsg(nickName + "의 대화명이 " + afterName + "으로 변경되었습니다");
+				oos.writeObject(mvo);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

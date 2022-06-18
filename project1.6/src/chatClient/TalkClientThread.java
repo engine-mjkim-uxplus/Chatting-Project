@@ -38,7 +38,7 @@ public class TalkClientThread extends Thread implements Serializable {
 
 				}
 					break;
-				case 200: {
+				case Protocol.MESSAGE: {
 
 				}
 					break;
@@ -101,7 +101,6 @@ public class TalkClientThread extends Thread implements Serializable {
 						for (int i = 0; i < tc.dtm.getRowCount(); i++) {
 							String n = (String) tc.dtm.getValueAt(i, 0);
 						}
-//						tc.initDisplay(false);
 						tc.showmsg_expulsion();
 						tc.dispose();
 					} else { // 다른 닉네임이면 강퇴 당한 아이디 채팅창에 그리고 대화목록에서 삭제
