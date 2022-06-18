@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 
-public class TalkServerThread extends Thread implements Serializable {
+public class TalkServerThread extends Thread {
 	SocketThread   		  sk	 			= null;
 	TalkServerView        view          	= null;
 	Socket 				  client 			= null;
@@ -17,6 +17,7 @@ public class TalkServerThread extends Thread implements Serializable {
 	ObjectInputStream     ois    			= null; 
 	String 			      nickName 			= null; // 현재 서버에 접속한 클라이언트 스레드 닉네임 저장
 	Vector<Object>		  oneRow			= null;
+	MsgVO				  mvo				= null; // 입장에 대한 msg 가지고 있음
 	public TalkServerThread(SocketThread sk) {
 		this.sk 	= sk;		 // 소켓쓰레드 주소값
 		this.client = sk.socket; // 방금 접속한 클라이언트의 정보(ip,port)
@@ -24,18 +25,13 @@ public class TalkServerThread extends Thread implements Serializable {
 		try {
 			oos = new ObjectOutputStream(client.getOutputStream()); // client소켓으로부터 아웃풋스트림 얻음
 			ois = new ObjectInputStream(client.getInputStream());   // client소켓으로부터 인풋스트림 얻음
-			MsgVO mvo = new MsgVO();
 			mvo = (MsgVO) ois.readObject(); 				// 사용자 nickName(JoptionPane) 읽어들임
-			String msg = mvo.getMsg();
-			view.jta_log.append(msg + "\n"); // jta_log는 서버의 ui에 TextArea부분에 msg붙인다.
-//			StringTokenizer st = new StringTokenizer(msg, Protocol.seperator); // ( msg = 100#nickName임 )
-//			st.nextToken(); 		   // msg = 100#nickName에서 100을 읽어들인다.
-			nickName = mvo.getNickname(); // msg에 남은 #nicKname에서 구분자 #을 빼고 nickName을 읽어들인다
+			nickName = mvo.getNickname(); 
 			view.jta_log.append(nickName + "님이 입장하였습니다.\n"); // 서버에 찍음
 			for (TalkServerThread tst : sk.globalList) {
-				this.send(mvo); // ※※※이전 참여자의 정보를 가져오는 부분 ※※※
+				this.send(mvo); // mvo에 프로토콜 100과 nickname 담겨있다
 			}										 		  // 방금 접속한 사용자에게 이전 접속자들 접속했다고 화면에 뛰운다
-			
+
 			// 현재 접속한 클라이언트의 닉네임, ip, 접속시간을 현재접속인원 창에 추가한다
 			InetAddress ip = client.getInetAddress();
 			String time    = sk.getDate() + sk.getTime();

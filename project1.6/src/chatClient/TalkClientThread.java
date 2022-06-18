@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import chatServer.MsgVO;
+import chatServer.Protocol;
 
 // 통신용 쓰레드 클래스 < 서버의 말을 듣는 역할을 한다 >
 public class TalkClientThread extends Thread implements Serializable {
@@ -17,25 +18,20 @@ public class TalkClientThread extends Thread implements Serializable {
 	/*
 	 * 서버에서 말한 내용을 들어봅시다.
 	 */
-	// run()메소드 즉 클라이언트 쓰레드는 Client 뷰에서 작성된 메시지가 서버로 보내지고
-	// 서버에서 ois즉 ObjectInputStream이 readObject()로 뷰에서 메시지가 전달되기까지 기다렸다가 메시지 받으면
-	// 지금 이 쓰레드로 ObjectWriter를 사용하여 메시지를 전달하고
-	// 이 쓰레드는 swicth문에서 전달 받은 프로토콜에 맞는 메시지가 사용자 화면에 출력된다.
 	public void run() {
 		boolean isStop = false;
 		MsgVO mvo = new MsgVO();
+		String msg = null;
+		int protocol = 0;
 		while (!isStop) {
 			try {
-				String msg = mvo.getMsg();// 100#apple // 입장할 때 프로토콜 100번
 				mvo = (MsgVO) tc.ois.readObject(); // 톡 서버쓰레드에서 넘어오는 메시지 기다리는중..
-				StringTokenizer st = null;
-				int protocol = mvo.getProtocol();// 100|200|201|202|500
+				msg = mvo.getMsg();
 				if (mvo.getMsg() != null) { 
-//					st = new StringTokenizer(msg, "#"); // 여기서 넘어온 100#메시지내용 을 분리
-					protocol = mvo.getProtocol(); // 100. 프로토콜(String)을 숫자로 바꿈
+					protocol = mvo.getProtocol(); // 프로토콜 읽어 들임
 				}
 				switch (protocol) {
-				case 100: {// 100#apple
+				case Protocol.ADMISSION: {// 100#apple
 					String nickName = mvo.getNickname();
 					tc.jta_display.append(nickName + "님이 입장하였습니다.\n");
 					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
@@ -49,7 +45,7 @@ public class TalkClientThread extends Thread implements Serializable {
 				}
 					break;
 				// 채팅보내기 (프로토콜 201)
-				case 201: {
+				case Protocol.GROUP_MESSAGE: {
 					String nickName = mvo.getNickname();
 					String message = mvo.getMsg();
 					tc.jta_display.append("[" + nickName + "]" + message + "\n");
@@ -57,10 +53,10 @@ public class TalkClientThread extends Thread implements Serializable {
 				}
 					break;
 				// 대화명변경 (프로토콜 202)
-				case 202: {
-					String nickName = st.nextToken();
-					String afterName = st.nextToken();
-					String message = st.nextToken();
+				case Protocol.NICNAME_CHANGE: {
+					String nickName = mvo.getNickname();
+					String afterName = mvo.getAfter_nickname();
+					String message = mvo.getMsg();
 					// 테이블에 대화명 변경하기
 					for (int i = 0; i < tc.dtm.getRowCount(); i++) {
 						String imsi = (String) tc.dtm.getValueAt(i, 0);
@@ -78,16 +74,16 @@ public class TalkClientThread extends Thread implements Serializable {
 				}
 					break;
 				// 서버에서 공지사항 보냄(프로토콜 203)
-				case 203: {
-					String nickName = st.nextToken();
-					String notice = st.nextToken();
+				case Protocol.NOTICE: {
+					String nickName = mvo.getNickname();
+					String notice = mvo.getMsg();
 					String n = "[" + nickName + "]" + notice;
 					tc.jta_display.setCaretPosition(tc.jta_display.getDocument().getLength());
 					tc.showmsg_Info(n); 
 				}
 					break;
 				// 클라이언트 나가기 누름 (프로토콜 500)
-				case 500: {
+				case Protocol.ROOM_OUT: {
 					String nickName = st.nextToken();
 					tc.jta_display.append(nickName + "님이 퇴장 하였습니다.\n");
 					tc.jta_display.setCaretPosition(tc.jta_display.getDocument().getLength());
@@ -100,7 +96,7 @@ public class TalkClientThread extends Thread implements Serializable {
 				}
 					break;
 				// 운영자에 의해 강제퇴장 당했을 경우
-				case 501: {
+				case Protocol.EXPULSION: {
 					String nickName = st.nextToken();
 					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
 						for (int i = 0; i < tc.dtm.getRowCount(); i++) {
