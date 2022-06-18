@@ -26,14 +26,12 @@ public class TalkClientThread extends Thread implements Serializable {
 		while (!isStop) {
 			try {
 				mvo = (MsgVO) tc.ois.readObject(); // 톡 서버쓰레드에서 넘어오는 메시지 기다리는중..
-				msg = mvo.getMsg();
-				if (mvo.getMsg() != null) { 
-					protocol = mvo.getProtocol(); // 프로토콜 읽어 들임
-				}
+				protocol = mvo.getProtocol(); // 프로토콜 읽어 들임
 				switch (protocol) {
 				case Protocol.ADMISSION: {// 100#apple
 					String nickName = mvo.getNickname();
 					tc.jta_display.append(nickName + "님이 입장하였습니다.\n");
+					System.out.println(nickName+"님이 입장하였습니다");
 					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
 					v.add(nickName);
 					tc.dtm.addRow(v); /// 접속인원 보여주는 dtm에 닉네임 추가
@@ -84,8 +82,9 @@ public class TalkClientThread extends Thread implements Serializable {
 					break;
 				// 클라이언트 나가기 누름 (프로토콜 500)
 				case Protocol.ROOM_OUT: {
-					String nickName = st.nextToken();
-					tc.jta_display.append(nickName + "님이 퇴장 하였습니다.\n");
+					String nickName = mvo.getNickname();
+					msg 			= mvo.getMsg();
+					tc.jta_display.append(msg);
 					tc.jta_display.setCaretPosition(tc.jta_display.getDocument().getLength());
 					for (int i = 0; i < tc.dtm.getRowCount(); i++) {
 						String n = (String) tc.dtm.getValueAt(i, 0);
@@ -97,7 +96,7 @@ public class TalkClientThread extends Thread implements Serializable {
 					break;
 				// 운영자에 의해 강제퇴장 당했을 경우
 				case Protocol.EXPULSION: {
-					String nickName = st.nextToken();
+					String nickName = mvo.getNickname();
 					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
 						for (int i = 0; i < tc.dtm.getRowCount(); i++) {
 							String n = (String) tc.dtm.getValueAt(i, 0);

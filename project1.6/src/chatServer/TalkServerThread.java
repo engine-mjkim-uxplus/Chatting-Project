@@ -29,7 +29,7 @@ public class TalkServerThread extends Thread {
 			nickName = mvo.getNickname(); 
 			view.jta_log.append(nickName + "님이 입장하였습니다.\n"); // 서버에 찍음
 			for (TalkServerThread tst : sk.globalList) {
-				this.send(mvo); // mvo에 프로토콜 100과 nickname 담겨있다
+				this.send(tst.mvo); // mvo에 프로토콜 100과 nickname 담겨있다
 			}										 		  // 방금 접속한 사용자에게 이전 접속자들 접속했다고 화면에 뛰운다
 
 			// 현재 접속한 클라이언트의 닉네임, ip, 접속시간을 현재접속인원 창에 추가한다
@@ -74,7 +74,6 @@ public class TalkServerThread extends Thread {
 				mvo = (MsgVO) ois.readObject(); // 사용자에게 입력 받을 때 까지 기다린다.
 				view.jta_log.append(mvo.getMsg() + "\n");
 				view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
-				StringTokenizer st = null; 
 				int protocol = 0;
 				
 				if (mvo.getMsg() != null) {
@@ -111,14 +110,7 @@ public class TalkServerThread extends Thread {
 					String nickName = mvo.getNickname();
 					sk.globalList.remove(this); // 클라이언트 나갔으므로 통신 쓰레드 지움
 					broadCasting(mvo);
-					if (view.dtm != null) {
-						for (int i = 0; i < view.dtm.getRowCount(); i++) {
-							String n = (String) view.dtm.getValueAt(i, 0);
-							if (n.equals(nickName)) {
-								view.dtm.removeRow(i); // 나가기 누르면 서버의 dtm(접속인원)에서 제거
-							}
-						}
-					}
+					sk. showNumber_Conpeople();
 					sk.userCount(); // 접속인원 JTexField 초기화 
 				}
 				break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료

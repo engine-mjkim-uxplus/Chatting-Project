@@ -149,21 +149,21 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 		if (jtf_msg == obj) {
 			System.out.println("채팅 친거야");
 			try {
-				mvo.setNickname(nickName);   			 // 테스트중
-				mvo.setMsg(msg); 						 // 테스트중
-				mvo.setProtocol(Protocol.GROUP_MESSAGE); // 테스트중
-				oos.writeObject(mvo);  					 // 테스트중
-//				oos.writeObject(201 + "#" + nickName + "#" + msg);
+				mvo.setNickname(nickName);   			
+				mvo.setMsg(msg); 						 
+				mvo.setProtocol(Protocol.GROUP_MESSAGE); 
+				oos.writeObject(mvo);  					 
 				jtf_msg.setText("");
 
 			} catch (Exception e) {
-				// TODO: handle exception
+				e.toString();
 			}
 		} else if (jbtn_exit == obj) {
 			try {
-				mvo.setNickname(nickName);
 				mvo.setProtocol(Protocol.ROOM_OUT);
-				oos.writeObject(500 + "#" + this.nickName);
+				mvo.setNickname(nickName);
+				mvo.setMsg(nickName + "님이 퇴장하였습니다.");
+				oos.writeObject(mvo);
 				// 자바가상머신과 연결고리 끊기
 				System.exit(0);
 			} catch (Exception e) {

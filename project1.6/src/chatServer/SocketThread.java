@@ -112,10 +112,12 @@ public class SocketThread extends Thread implements Serializable {
 											JOptionPane.INFORMATION_MESSAGE);
 			return;
 		} else if (globalList.size() != 0) {
+			MsgVO mvo = new MsgVO();
+			mvo.setProtocol(Protocol.NOTICE);
+			mvo.setNickname(administrator);
+			mvo.setMsg(notice_msg);
 			for (TalkServerThread tst : globalList)
-						tst.send(Protocol.NOTICE 
-						+Protocol.seperator + administrator
-						+Protocol.seperator + notice_msg);
+						tst.send(mvo);
 		} else if (notice_msg != null && globalList.size() == 0) {
 			JOptionPane.showMessageDialog(view, "현재 접속중인 사용자가 없습니다", "INFO", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -123,13 +125,13 @@ public class SocketThread extends Thread implements Serializable {
 	
 	// 강퇴 이벤트 처리 ( 클라이언트에게 직접 말하기 )
 	public void expulsion(int select) {
-		String nicname = (String) view.dtm.getValueAt(select, 0);
-
+		String nickname = (String) view.dtm.getValueAt(select, 0);
 		for (TalkServerThread tst : globalList) {
-			if (nicname.equals(tst.nickName)) {
-							 String msg = Protocol.EXPULSION
-							+Protocol.seperator + tst.nickName;
-				tst.broadCasting(msg); // 강퇴메시지
+			if (nickname.equals(tst.nickName)) {
+				MsgVO mvo = new MsgVO();
+				mvo.setProtocol(Protocol.EXPULSION);
+				mvo.setNickname(nickname);
+				tst.broadCasting(mvo); // 강퇴메시지
 				globalList.remove(tst);
 				view.dtm.removeRow(select);
 				view.jta_log.append(tst.nickName + "님을 강퇴하였습니다.\n");
