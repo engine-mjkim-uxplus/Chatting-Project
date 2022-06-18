@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class Sign extends JFrame implements ActionListener {
+public class SignUpView extends JFrame implements ActionListener {
 	// 선언부
 	String nickName = ""; //
 	String imgPath = "C:\\\\Users\\\\MJ\\\\Desktop\\\\새 폴더"; // 이미지 경로를 문자열로..지정??
@@ -31,7 +31,6 @@ public class Sign extends JFrame implements ActionListener {
 	JPasswordField jpf_pw = new JPasswordField("");
 	JPasswordField jpf_repw = new JPasswordField("");
 	JTextField jtf_name = new JTextField("");
-	JTextField jtf_number = new JTextField("");
 
 	JButton jbtn_idcheck = new JButton(new ImageIcon(imgPath + "/버튼.png")); // 버튼
 	JButton jbtn_ok = new JButton(new ImageIcon(imgPath + "/가입하기.png"));
@@ -39,27 +38,13 @@ public class Sign extends JFrame implements ActionListener {
 	// JPanel에 쓰일 이미지아이콘
 	ImageIcon ig = new ImageIcon(imgPath + "/main4.png");
 	boolean isIDCheck = false;
-	LoginDao logindao;
+	
+	TalkClient talkclient = TalkClient.getInstance();
 
 	// 생성자
-	public Sign() {
+	public SignUpView() {
 		initDisplay();
-		jbtn_ok.addActionListener(this);
-		jbtn_idcheck.addActionListener(this);
-
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				if (e.getSource() == jbtn_ok) {
-//					new Login();
-//					dispose();
-//				}
-//			}
-//		});
-
 	}
-	/////////////////////////////////////////////////////
-	/* jpanal 오버라이드 */
-	/////////////////////////////////////////////////////
 
 	/* 배경이미지 */
 	class mypana2 extends JPanel {
@@ -77,8 +62,8 @@ public class Sign extends JFrame implements ActionListener {
 		setContentPane(new mypana2());
 
 		/* 버튼과 텍스트필드 구성 */
-//		jbtn_ok.addActionListener(this);
-//		jbtn_but.addActionListener(this);
+		jbtn_ok.addActionListener(this);
+		jbtn_idcheck.addActionListener(this);
 		this.setLayout(null);
 		this.setTitle("꽉자바패밀리 ver.1"); // 타이틀 제목
 		this.setSize(350, 600); // 로그인 창 사이즈 - 2개의 파라미터로 지정
@@ -127,31 +112,68 @@ public class Sign extends JFrame implements ActionListener {
 		this.add(jbtn_idcheck);
 	}
 
+	
+	
+	public String getId() {
+		return jtf_id.getText();
+	}
+	public void setId(String msg) {
+		jtf_id.setText(msg);
+	}
+	public String getPw() {
+		return jpf_pw.getText();
+	}
+	public String getrePw() {
+		return jpf_repw.getText();
+	}
+	public String getName() {
+		return jtf_name.getText();
+	}
+	public void successMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Success!", JOptionPane.INFORMATION_MESSAGE);
+	}
+	public void errorMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error!", JOptionPane.ERROR_MESSAGE);
+	}
+	public boolean spaceCheck() {
+		boolean result = true;
+		if (getId().length() == 0 ||
+			getPw().length() == 0 ||
+			getrePw().length() == 0 ||
+			getName().length() == 0) 
+		{ result = false; }
+		return result;
+	}
+	public boolean passwordCheck() {
+		boolean result = false;
+		if (getPw().equals(getrePw())) {
+			result = true;
+		}
+		return result;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// 중복아이디 없을 경우 1, 아이디 중복있어서 사용 못할 경우 -1
 		if (jbtn_idcheck == e.getSource()) {
+
 			System.out.println("중복검사 버튼 눌러짐"); // 단위테스트용
-			String user_id = jtf_id.getText();
-			logindao = new LoginDao();
-			int result = logindao.idCheck(user_id); // id 중복체크 메소드(Dao)
+			int result = talkclient.idCheck(getId()); // id 중복체크 메소드(Dao)
+			System.out.println("result 값 : "+result);
 			// 입력아이디 사용 가능(중복없음) = 1
 			if (result == 1) {
 				// 입력 아이디 사용가능
 				// 입력한 아이디는 사용 못해
 				// 다시 입력해야 된다.
-				JOptionPane.showMessageDialog(null, "입력한 아이디는 사용할 수 있습니다.", "INFO", JOptionPane.INFORMATION_MESSAGE);
+				successMsg("입력한 아이디는 사용할 수 있습니다.");
 				jtf_id.setEditable(false);
 				jbtn_idcheck.setEnabled(false);
 				isIDCheck = true;
 				jbtn_ok.setEnabled(isIDCheck);
 				return;
-
-			}
-			// 입력아이디 사용 불가(중복있음) = -1
-			else if (result == -1) {
-				jtf_id.setText("");
-				JOptionPane.showMessageDialog(null, "입력하신 아이디는 이미 존재하는 아이디입니다.", "Error", JOptionPane.ERROR_MESSAGE);
+			}else { // 입력아이디 사용 불가(중복있음) = -1
+				setId("");
+				errorMsg("입력하신 아이디는 이미 존재하는 아이디 입니다.");
 				return;
 			}
 		} // 회원가입 버튼 이벤트 처리
@@ -160,32 +182,21 @@ public class Sign extends JFrame implements ActionListener {
 			
 			// 중복검사 버튼이 눌러졌는 지 체크하는 조건문 추가해야함
 			// 모든 텍스트 필드들이 공백이 아닐때만 회원가입 처리(나중에 db에서 반환값 던져서 처리할 것)		
-			if (!(jtf_id.getText().equals("")) && !(jpf_pw.getText().equals("")) && !(jpf_repw.getText().equals(""))
-					&& !(jtf_name.getText().equals(""))) {
-				
+			if (spaceCheck()) {
 				// 비밀번호 중복검사
-				if (jpf_pw.getText().equals(jpf_repw.getText())) {
-					String user_id = jtf_id.getText();
-					String user_pw = jpf_pw.getText();
-					String user_name = jtf_name.getText();
-					logindao = new LoginDao();
-					logindao.signup(user_id, user_pw, user_name);
-					JOptionPane.showMessageDialog(null, "회원가입을 축하합니다!!", "INFO", JOptionPane.INFORMATION_MESSAGE);
-					new Login();
+				if (passwordCheck()) {
+					talkclient.signUp(getId(), getPw(), getName());
+					successMsg("회원가입을 축하합니다!!");
+					new LoginView();
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(null, "입력한 비밀번호가 다릅니다. 다시 작성해 주세요", "Error",
-							JOptionPane.ERROR_MESSAGE);
+					errorMsg("입력한 비밀번호가 다릅니다. 확인 해주세요");
 					return;
 				}
-			} 
-			
-			else {
-				JOptionPane.showMessageDialog(null, "모든 입력창에 값을 입력해 주세요.", "Error", JOptionPane.ERROR_MESSAGE);
+			} else {
+				errorMsg("빈칸이 있습니다. 모두 작성해 주세요.");
 				return;
 			}
-
 		}
 	}
-
 }

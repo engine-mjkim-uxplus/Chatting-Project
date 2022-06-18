@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,10 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 // LoginView
-public class Login extends JFrame implements ActionListener {
+public class LoginView extends JFrame implements ActionListener {
 	//선언부
 	String nickName = "";
-	String imgPath = "C:\\Users\\MJ\\Desktop\\이미지\\";
+	String imgPath = "C:\\Users\\MJ\\Desktop\\새 폴더\\";
 	JLabel jlb_id = new JLabel("아이디");
 	JLabel jlb_pw = new JLabel("패스워드");
 	Font jl_font = new Font("맑은고딕체", Font.BOLD, 14);
@@ -31,11 +30,9 @@ public class Login extends JFrame implements ActionListener {
 	// JPanel에 쓰일 이미지아이콘
 	ImageIcon ig = new ImageIcon(imgPath + "둥이.png");
 
-	String user_Id; // 톡클라이언트에게 넘기기 위해 ID 전역변수로 설정
-	String user_Name; // 톡클라이언트에게 넘기기 위해 닉네임 전역변수로 설정
-	LoginDao loginDao;
-
-	public Login() {
+	TalkClient talkclient = TalkClient.getInstance();
+	
+	public LoginView() {
 		initDisplay();
 	}
 
@@ -58,8 +55,8 @@ public class Login extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == jbtn_join) {
-					new Sign();
 					dispose();
+					new SignUpView();
 				}
 			}
 		});
@@ -106,52 +103,55 @@ public class Login extends JFrame implements ActionListener {
 		this.add(jbtn_join);
 	}
 
-	public static void main(String[] args) {
-		new Login();
+	public void successMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Success!", JOptionPane.INFORMATION_MESSAGE);
+	}
+	public void errorMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error!", JOptionPane.ERROR_MESSAGE);
+	}
+	public String getId() {
+		return jtf_id.getText();
+	}
+	public String getPw() {
+		return jpf_pw.getText();
 	}
 
+	public static void main(String[] args) {
+		new LoginView();
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// JTextField 엔터 이벤트 처리
 		if (jtf_id == e.getSource() || jpf_pw == e.getSource() || jbtn_login == e.getSource()) {
 			if (!(jtf_id.getText().equals("")) && !(jpf_pw.getText().equals(""))) {
+				
 				System.out.println("로그인 호출 성공");
-				// 사용자가 화면에 입력하는 아이디를 담기
-				user_Id = jtf_id.getText();
-				// 사용자가 화면에 입력하는 비번을 담기
-				String user_pw = jpf_pw.getText();
-				// 오라클 서버에서 반환 값 담기
-				int result = 0; // 이름(1) or 0(비번이 틀림) or -1(아이디가 존재하지 않음)
-				loginDao = new LoginDao();
-				// 사용자가 입력한 아이디와 비번을 Dao클래스의 login메소드에 파라미터로 넘김
-				result = loginDao.login(user_Id, user_pw);
-				// 위에서 오라클 서버에 요청한 결과를 출력하기
-				user_Name = loginDao.name(user_Id);
+				String result = ""; // 이름(1) or 0(비번이 틀림) or -1(아이디가 존재하지 않음)
+				result = talkclient.loginCheck(getId(),getPw());
 				System.out.println("result : " + result);
 
-				if (result == 1) {
-					this.dispose();
-					TalkClient tc = new TalkClient(this);
-					tc.initDisplay(tc.is);
-					tc.init();
-				} else if (result == 0) {
-					JOptionPane.showMessageDialog(this, "비밀번호가 틀렸습니다", "ERROR", JOptionPane.ERROR_MESSAGE);
+				if (result.equals("0")) {
+					errorMsg("비밀번호가 틀렸습니다!");
 					return;
-				} else if (result == -1) {
-					JOptionPane.showMessageDialog(this, "존재하지 않는 아이디입니다.", "ERROR", JOptionPane.ERROR_MESSAGE);
+				} else if (result.equals("-1")) {
+					errorMsg("존재하지 않는 아이디입니다.");
 					return;
+				}else {
+					new ChatView();
+					talkclient.setnickName(result);
+					talkclient.init(result);
+					dispose();
 				}
 
 			} else if (jtf_id.getText().equals("")) {
-				JOptionPane.showMessageDialog(this, "아이디를 입력해 주세요", "ERROR", JOptionPane.ERROR_MESSAGE);
+				errorMsg("아이디를 입력 해주세요");
 				return;
 
 			} else if (jpf_pw.getText().equals("")) {
-				JOptionPane.showMessageDialog(this, "비밀번호를 입력해 주세요", "ERROR", JOptionPane.ERROR_MESSAGE);
+				errorMsg("비밀번호를 입력 해주세요");
 				return;
-
 			}
 		}
-
 	}
 }

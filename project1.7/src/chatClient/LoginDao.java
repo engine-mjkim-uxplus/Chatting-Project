@@ -18,7 +18,7 @@ public class LoginDao {
 
 	// 회원가입 메소드(signUp) -- 회원가입 버튼과 매핑
 	public void signup(String _id, String _pw, String _name) {
-		String sql = "INSERT INTO MEMBER(ID,PW,NAME) VALUES(?,?,?)";
+		String sql = "INSERT INTO MEMBER(ID,PWD,NAME) VALUES(?,?,?)";
 
 		con = DButil.getOracleConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
 		try {
@@ -60,9 +60,9 @@ public class LoginDao {
 
 	// 로그인 확인 메소드 -- 로그인 버튼에서 호출
 	// 로그인 성공시 1반환, 비밀번호 불일치 0반환, 아이디 없을 경우 -1반환
-	public int login(String _id, String _pw) {
+	public String login(String _id, String _pw) {
 		String sql = "SELECT * FROM MEMBER WHERE ID = ?";
-		int result = 0;
+		String result = "0";
 		con = DButil.getOracleConnection();
 		try {
 			pstmt = con.prepareStatement(sql);
@@ -70,17 +70,17 @@ public class LoginDao {
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) { // 아이디가 일치하고 비밀번호가 일치할 경우 1, 비밀번호 틀렸을 경우 0 반환, 아이디 없을경우 -1
-					if (rs.getString("pw").equals(_pw)) { // String의 오버라이딩 된 equals로 비밀번호 확인
+					if (rs.getString("PWD").equals(_pw)) { // String의 오버라이딩 된 equals로 비밀번호 확인
 						System.out.println("로그인 합니다"); // 단위테스트용
-						result= 1;
-					} else if(rs.getString("PW") != _pw) {
+						result= rs.getString("name");
+					} else if(rs.getString("PWD") != _pw) {
 						System.out.println("비밀번호가 틀렸습니다"); // 단위테스트용
-						result = 0;
+						result = "0";
 					}
 				}
 				else {
 					System.out.println("입력하신 아이디는 존재하지 않습니다"); // 단위테스트용
-					result = -1;
+					result = "-1";
 				}
 			
 		} catch (SQLException e) {
