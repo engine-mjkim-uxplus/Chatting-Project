@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import javax.swing.JOptionPane;
 * 			2. View에 대한 컨트롤러 역할 (뷰의 이벤트 처리) - 유지보수 용이
 * 			3. 서버에서 직접적으로 사용자에게 말하고자 할 때 사용 ( 공지사항, 강퇴처리 )
 ********************************************************************************************/
-public class SocketThread extends Thread {
+public class SocketThread extends Thread implements Serializable {
 	ChatDao 		 		 dao 				= 		null; // DB전담하여 쿼리문 질의하는 객체
 	TalkServerThread 		 tst 				= 		null; // 각 클라이언트의 통신담당하는 쓰레드1
 	ServerSocket 			 server 			= 		null; // ip와 port 바인드하여 클라이언트 접속을 받는 객체
