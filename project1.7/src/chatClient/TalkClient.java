@@ -63,7 +63,6 @@ public class TalkClient {
 		} catch (Exception e) {
 			e.toString();
 		}
-
 	}
 
 	// 대화방 나가기 (Protocol.ROOM_OUT)

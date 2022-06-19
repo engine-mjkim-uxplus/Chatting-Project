@@ -67,6 +67,7 @@ public class TalkClient extends JFrame implements ActionListener{
 	// 서버에서 접속끊기 누르면 해당 클라이언트 종료되면서
 	// 밑의 경고창 뜨게 하는 메소드
 	public void showmsg_expulsion() {
+		
 		JOptionPane.showMessageDialog(this, "운영자에 의해 강퇴당하셨습니다.", "INFO", JOptionPane.INFORMATION_MESSAGE);
 
 	}

@@ -33,18 +33,16 @@ public class LoginView extends JFrame implements ActionListener {
 	// JPanel에 쓰일 이미지아이콘
 	ImageIcon ig = new ImageIcon(imgPath + "둥이.png");
 	// 컨트롤러 싱긍톤으로 생성
-	Controller controller = null;
 	
-	
+	Controller controller = Controller.getInstance();
 	public LoginView() {
-		this.controller = new Controller(this);
 		initDisplay();
 	}
 
 	/* 배경이미지 */
 	class mypanal extends JPanel {
 		private static final long serialVersionUID = 1L;
-
+		
 		public void paintComponent(Graphics g) {
 			g.drawImage(ig.getImage(), 0, 0, null);
 			setOpaque(false);
@@ -121,7 +119,22 @@ public class LoginView extends JFrame implements ActionListener {
 				pmVO.setCommand("login");
 				pmVO.setMem_id(getId());
 				pmVO.setMem_pw(getPw());
-				controller.action( pmVO);
+				MemberVO rsVO = new MemberVO(); // 리턴받을 rsVO생성
+				rsVO = controller.action(pmVO); // return값 rsVO
+				String nickName = rsVO.getMem_name();
+				System.out.println("result : " + nickName);
+					if (nickName.equals("0")) {
+						errorMsg("비밀번호가 틀렸습니다!");
+						return;
+					} else if (nickName.equals("-1")) {
+						errorMsg("존재하지 않는 아이디입니다.");
+						return;
+					}else {
+						TalkClient tc = new TalkClient(nickName);
+						new ChatView(tc);
+						tc.init();
+						dispose();
+					}
 			} else if (jtf_id.getText().equals("")) {
 				errorMsg("아이디를 입력 해주세요");
 				return;
@@ -131,6 +144,7 @@ public class LoginView extends JFrame implements ActionListener {
 				return;
 			}
 		}
+	
 	}
 	public void successMsg(String msg) {
 		JOptionPane.showMessageDialog(this, msg, "Success!", JOptionPane.INFORMATION_MESSAGE);

@@ -39,12 +39,11 @@ public class SignUpView extends JFrame implements ActionListener {
 	ImageIcon ig = new ImageIcon(imgPath + "/main4.png");
 	boolean isIDCheck = false;
 	
-	Controller controller = null;
+	Controller controller = Controller.getInstance();
 	
 	// 생성자
 	public SignUpView() {
 		initDisplay();
-		this.controller = new Controller(this);
 	}
 
 	/* 배경이미지 */
@@ -121,7 +120,21 @@ public class SignUpView extends JFrame implements ActionListener {
 			MemberVO pmVO = new MemberVO();
 			pmVO.setCommand("idcheck");
 			pmVO.setMem_id(getId());
-			controller.action(pmVO);
+			MemberVO rsVO = new MemberVO();
+			rsVO = controller.action(pmVO);
+			String result = String.valueOf(rsVO.getResult());
+			if (result.equals("-1")) {  // -1이면 사용가능
+				successMsg("입력한 아이디는 사용할 수 있습니다.");
+				jtf_id.setEditable(false); // 사용자가 아이디 다른것 입력하고 싶을 수 있으므로 x
+				jbtn_idcheck.setEnabled(false);
+				isIDCheck = true; // 상수값으로 직접 값변경 x
+				jbtn_ok.setEnabled(isIDCheck);
+				return;
+			}else { // 입력아이디 사용 불가(중복있음) = 1이면 사용불가
+				setId("");
+				errorMsg("이미 존재하는 아이디 입니다.");
+				return;
+			}			
 		} // 회원가입 버튼 이벤트 처리
 		if (jbtn_ok == e.getSource()) {
 			System.out.println("회원가입 버튼 눌러짐"); // 단위테스트용	
@@ -130,7 +143,23 @@ public class SignUpView extends JFrame implements ActionListener {
 			pmVO.setMem_id(getId());
 			pmVO.setMem_pw(getPw());
 			pmVO.setMem_name(getName());
-			controller.action(pmVO);
+			MemberVO rsVO = new MemberVO();
+			rsVO = controller.action(pmVO);
+			int result = rsVO.getResult();
+			if (spaceCheck()) {
+				// 비밀번호 중복검사
+				if (passwordCheck() && result == 1) {
+					successMsg("회원가입을 축하합니다!!");
+					new LoginView();
+					dispose();
+				} else {
+					errorMsg("입력한 비밀번호가 다릅니다. 확인 해주세요");
+					return;
+					}
+				}
+			else{
+				errorMsg("빈칸이 있습니다. 모두 작성해 주세요.");		
+			}
 		}
 	}
 	public String getId() {

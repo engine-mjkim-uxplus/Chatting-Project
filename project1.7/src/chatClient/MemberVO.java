@@ -1,10 +1,13 @@
 package chatClient;
 
-public class MemberVO {
+import java.io.Serializable;
+
+public class MemberVO implements Serializable{
 	private String mem_id       = null;
 	private String mem_pw       = null;
 	private String mem_name     = null;
 	private String command 	    = null;	
+	private int	   result		= 0;
 	public String getMem_id() {
 		return mem_id;
 	}
@@ -28,6 +31,12 @@ public class MemberVO {
 	}
 	public void setCommand(String command) {
 		this.command = command;
+	}
+	public int getResult() {
+		return result;
+	}
+	public void setResult(int result) {
+		this.result = result;
 	}
 	
 }
