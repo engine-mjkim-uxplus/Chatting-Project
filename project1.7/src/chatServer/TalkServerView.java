@@ -145,6 +145,12 @@ public class TalkServerView extends JFrame implements ActionListener {
 				
 			
 		}
-
 	} // end of actionPerformed
+	
+	public void successMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Success!", JOptionPane.INFORMATION_MESSAGE);
+	}
+	public void errorMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error!", JOptionPane.ERROR_MESSAGE);
+	}
 }	// end of TalkServerView

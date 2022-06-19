@@ -17,9 +17,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 // LoginView
 public class LoginView extends JFrame implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//선언부
-	String nickName = "";
-	String imgPath = "C:\\Users\\MJ\\Desktop\\새 폴더\\";
+	String imgPath = "C:\\Users\\MJ\\Desktop\\이미지\\";
 	JLabel jlb_id = new JLabel("아이디");
 	JLabel jlb_pw = new JLabel("패스워드");
 	Font jl_font = new Font("맑은고딕체", Font.BOLD, 14);
@@ -29,15 +32,19 @@ public class LoginView extends JFrame implements ActionListener {
 	JButton jbtn_join = new JButton(new ImageIcon(imgPath + "회원가입2.png"));
 	// JPanel에 쓰일 이미지아이콘
 	ImageIcon ig = new ImageIcon(imgPath + "둥이.png");
-
-	TalkClient talkclient = TalkClient.getInstance();
+	// 컨트롤러 싱긍톤으로 생성
+	Controller controller = null;
+	
 	
 	public LoginView() {
+		this.controller = new Controller(this);
 		initDisplay();
 	}
 
 	/* 배경이미지 */
 	class mypanal extends JPanel {
+		private static final long serialVersionUID = 1L;
+
 		public void paintComponent(Graphics g) {
 			g.drawImage(ig.getImage(), 0, 0, null);
 			setOpaque(false);
@@ -103,6 +110,28 @@ public class LoginView extends JFrame implements ActionListener {
 		this.add(jbtn_join);
 	}
 
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// JTextField 엔터 이벤트 처리
+		if (jtf_id == e.getSource() || jpf_pw == e.getSource() || jbtn_login == e.getSource()) {
+			if (!(jtf_id.getText().equals("")) && !(jpf_pw.getText().equals(""))) {
+				System.out.println("로그인 호출 성공");
+				MemberVO pmVO = new MemberVO();
+				pmVO.setCommand("login");
+				pmVO.setMem_id(getId());
+				pmVO.setMem_pw(getPw());
+				controller.action( pmVO);
+			} else if (jtf_id.getText().equals("")) {
+				errorMsg("아이디를 입력 해주세요");
+				return;
+
+			} else if (jpf_pw.getText().equals("")) {
+				errorMsg("비밀번호를 입력 해주세요");
+				return;
+			}
+		}
+	}
 	public void successMsg(String msg) {
 		JOptionPane.showMessageDialog(this, msg, "Success!", JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -115,43 +144,9 @@ public class LoginView extends JFrame implements ActionListener {
 	public String getPw() {
 		return jpf_pw.getText();
 	}
-
+	
 	public static void main(String[] args) {
 		new LoginView();
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// JTextField 엔터 이벤트 처리
-		if (jtf_id == e.getSource() || jpf_pw == e.getSource() || jbtn_login == e.getSource()) {
-			if (!(jtf_id.getText().equals("")) && !(jpf_pw.getText().equals(""))) {
-				
-				System.out.println("로그인 호출 성공");
-				String result = ""; // 이름(1) or 0(비번이 틀림) or -1(아이디가 존재하지 않음)
-				result = talkclient.loginCheck(getId(),getPw());
-				System.out.println("result : " + result);
-
-				if (result.equals("0")) {
-					errorMsg("비밀번호가 틀렸습니다!");
-					return;
-				} else if (result.equals("-1")) {
-					errorMsg("존재하지 않는 아이디입니다.");
-					return;
-				}else {
-					new ChatView();
-					talkclient.setnickName(result);
-					talkclient.init(result);
-					dispose();
-				}
-
-			} else if (jtf_id.getText().equals("")) {
-				errorMsg("아이디를 입력 해주세요");
-				return;
-
-			} else if (jpf_pw.getText().equals("")) {
-				errorMsg("비밀번호를 입력 해주세요");
-				return;
-			}
-		}
+		
 	}
 }

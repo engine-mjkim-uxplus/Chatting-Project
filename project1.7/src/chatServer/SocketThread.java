@@ -108,8 +108,7 @@ public class SocketThread extends Thread implements Serializable {
 	// 공지사항 이벤트 처리( 클라이언트에게 직접 말하기 )
 	public void notice(String notice_msg) {
 		if (notice_msg == null || notice_msg.trim().length() < 1) {
-			JOptionPane.showMessageDialog(view, "메시지는 공백일 수 없습니다. 다시 입력하세요", "INFO",
-											JOptionPane.INFORMATION_MESSAGE);
+			view.errorMsg("메시지는 공백일 수 없습니다. 다시 입력하세요.");
 			return;
 		} else if (globalList.size() != 0) {
 			MsgVO mvo = new MsgVO();
@@ -119,7 +118,7 @@ public class SocketThread extends Thread implements Serializable {
 			for (TalkServerThread tst : globalList)
 						tst.send(mvo);
 		} else if (notice_msg != null && globalList.size() == 0) {
-			JOptionPane.showMessageDialog(view, "현재 접속중인 사용자가 없습니다", "INFO", JOptionPane.INFORMATION_MESSAGE);
+			view.errorMsg("현재 접속중인 사용자가 없습니다");
 		}
 	}
 	

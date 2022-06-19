@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -27,7 +26,7 @@ import chatServer.MsgVO;
 import chatServer.Protocol;
 
 // 로그인 후 단톡 채팅방 UI 및 클라이언트 소켓 생성클래스
-public class TalkClient extends JFrame implements ActionListener, Serializable {
+public class TalkClient extends JFrame implements ActionListener{
 	//////////////// 통신과 관련한 전역변수 추가 시작//////////////
 	Socket socket = null;
 	ObjectOutputStream oos = null;// 말 하고 싶을 때
@@ -176,7 +175,7 @@ public class TalkClient extends JFrame implements ActionListener, Serializable {
 				return;
 			}
 			try {
-				mvo.setProtocol(Protocol.NICNAME_CHANGE);
+				mvo.setProtocol(Protocol.NICKNAME_CHANGE);
 				mvo.setNickname(nickName);
 				mvo.setAfter_nickname(afterName);
 				mvo.setMsg(nickName + "님의 대화명이 " + afterName + "으로 변경되었습니다");

@@ -99,7 +99,7 @@ public class TalkServerThread extends Thread {
 				}
 					break;
 				// 대화명 변경에 대해 단체로 전달
-				case Protocol.NICNAME_CHANGE: {
+				case Protocol.NICKNAME_CHANGE: {
 					this.nickName = mvo.getAfter_nickname();
 					broadCasting(mvo);
 				}

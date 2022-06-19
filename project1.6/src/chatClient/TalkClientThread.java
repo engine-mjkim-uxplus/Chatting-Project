@@ -1,14 +1,11 @@
 package chatClient;
-
-import java.io.Serializable;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 import chatServer.MsgVO;
 import chatServer.Protocol;
 
 // 통신용 쓰레드 클래스 < 서버의 말을 듣는 역할을 한다 >
-public class TalkClientThread extends Thread implements Serializable {
+public class TalkClientThread extends Thread {
 	TalkClient tc = null; 
 
 	public TalkClientThread(TalkClient tc) {
@@ -51,7 +48,7 @@ public class TalkClientThread extends Thread implements Serializable {
 				}
 					break;
 				// 대화명변경 (프로토콜 202)
-				case Protocol.NICNAME_CHANGE: {
+				case Protocol.NICKNAME_CHANGE: {
 					String nickName = mvo.getNickname();
 					String afterName = mvo.getAfter_nickname();
 					String message = mvo.getMsg();

@@ -10,7 +10,7 @@ public class Protocol {
 	public static final int ROOM_INLIST		= 140; 
 	public static final int MESSAGE 		= 200;
 	public static final int GROUP_MESSAGE   = 201;
-	public static final int NICNAME_CHANGE  = 202;
+	public static final int NICKNAME_CHANGE  = 202;
 	public static final int NOTICE		    = 203;
 	public static final int WHISHER 		= 209; 
 	public static final int CHANGE   		= 300; 

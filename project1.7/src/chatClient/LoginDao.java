@@ -9,6 +9,7 @@ import java.util.List;
 import chatServer.ChatMsgVO;
 import chatServer.DButil;
 // 클라이언트에서 쓸 dao클래스
+
 public class LoginDao {
 
 	Connection con;
@@ -17,98 +18,93 @@ public class LoginDao {
 	List<ChatMsgVO> list;
 
 	// 회원가입 메소드(signUp) -- 회원가입 버튼과 매핑
-	public void signup(String _id, String _pw, String _name) {
-		String sql = "INSERT INTO MEMBER(ID,PWD,NAME) VALUES(?,?,?)";
-
+	public int signUp(MemberVO pmVO) {
+		int result = 0;
+		String sql = "INSERT INTO MEMBER(ID,PW,NAME) VALUES(?,?,?)";
+		
 		con = DButil.getOracleConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
 		try {
 			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, _id);
-			pstmt.setString(2, _pw);
-			pstmt.setString(3, _name);
-//			pstmt.setString(4, _phone); -- 나중에 추가
-			int i = pstmt.executeUpdate();
-			System.out.println("데이터 " + i + "건이 추가되었습니다");
+			pstmt.setString(1, pmVO.getMem_id());
+			pstmt.setString(2, pmVO.getMem_pw());
+			pstmt.setString(3, pmVO.getMem_name());
+			result = pstmt.executeUpdate();
+			System.out.println("데이터 " + result + "건이 추가되었습니다");
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
 		DButil.close(con, pstmt);
-
+		}
+		return result;
 	}
 
 	// 아이디 중복검사 메소드(idCheck) -- 회원가입 아이디 중복검사 번튼과 매핑처리
-	public int idCheck(String _id) {
-		String sql = "SELECT ID FROM MEMBER WHERE ID = ?"; // id가 있다면
-		int result = 0;
+	public String idCheck(MemberVO pmVO) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT *                                    ");
+		sql.append("  FROM (                                    ");
+		sql.append("        SELECT                              ");
+		sql.append("               CASE WHEN ID = ? THEN '1'	");
+		sql.append("               ELSE '-1'                    ");
+		sql.append("                END IDCHECK                 ");
+		sql.append("          FROM MEMBER                       ");
+		sql.append("        ORDER BY IDCHECK DESC               ");
+		sql.append("       )                                    ");
+		sql.append(" WHERE ROWNUM = 1                           ");
+		String result = "";
 
 		con = DButil.getOracleConnection();
 		try {
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, _id);
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, pmVO.getMem_id());
 			rs = pstmt.executeQuery();
 			if (rs.next()) { // rs.next()가 true라는 것은 id가 있다는 것
-				result = -1; // 아이디 중복이 있으면 -1반환
-			} else
-				result = 1; // 중복이 없다면 1반환
+				result = rs.getString("IDCHECK"); // 아이디 중복이 있으면 -1반환
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
 		DButil.close(con, pstmt, rs); // 닫기
-
+		}
 		return result;
 	}
 
 	// 로그인 확인 메소드 -- 로그인 버튼에서 호출
 	// 로그인 성공시 1반환, 비밀번호 불일치 0반환, 아이디 없을 경우 -1반환
-	public String login(String _id, String _pw) {
-		String sql = "SELECT * FROM MEMBER WHERE ID = ?";
-		String result = "0";
+	public String login(MemberVO pmVO) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT *											");
+		sql.append("  FROM (			 								");
+		sql.append("		SELECT 									    ");
+		sql.append("		       CASE WHEN ID = ? THEN				");
+		sql.append("		            CASE WHEN PW = ? THEN NAME  ");
+		sql.append("		            ELSE '0'					    ");
+		sql.append("		            END								");
+		sql.append("		       ELSE '-1'							");
+		sql.append("		        END LOGIN							");
+		sql.append("		  FROM MEMBER 								");
+		sql.append("		ORDER BY LOGIN DESC							");
+		sql.append("	   )											");
+		sql.append(" WHERE ROWNUM = 1									");
+		
+		String result = "";
 		con = DButil.getOracleConnection();
 		try {
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, _id);
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, pmVO.getMem_id());
+			pstmt.setString(2, pmVO.getMem_pw());
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) { // 아이디가 일치하고 비밀번호가 일치할 경우 1, 비밀번호 틀렸을 경우 0 반환, 아이디 없을경우 -1
-					if (rs.getString("PWD").equals(_pw)) { // String의 오버라이딩 된 equals로 비밀번호 확인
-						System.out.println("로그인 합니다"); // 단위테스트용
-						result= rs.getString("name");
-					} else if(rs.getString("PWD") != _pw) {
-						System.out.println("비밀번호가 틀렸습니다"); // 단위테스트용
-						result = "0";
-					}
-				}
-				else {
-					System.out.println("입력하신 아이디는 존재하지 않습니다"); // 단위테스트용
-					result = "-1";
+					result = rs.getString("LOGIN");
 				}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
 		DButil.close(con, pstmt, rs);
+		}
 		return result;
-	}
-
-	// 로그인 후 닉네임 물어오기
-	// view에서 if처리(login()메소드 리턴값 1이면 name()메소드 실행 되도록 작성)
-	public String name(String _id) {
-		String sql = "SELECT NAME FROM MEMBER WHERE ID = ?";
-		String name = "";
-		con = DButil.getOracleConnection();
-		try {
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, _id);
-			rs = pstmt.executeQuery();
-
-			if (rs.next()) {
-				name = rs.getString("NAME");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		DButil.close(con, pstmt, rs);
-		return name;
 	}
 
 }

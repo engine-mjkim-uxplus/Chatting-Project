@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 public class SignUpView extends JFrame implements ActionListener {
 	// 선언부
 	String nickName = ""; //
-	String imgPath = "C:\\\\Users\\\\MJ\\\\Desktop\\\\새 폴더"; // 이미지 경로를 문자열로..지정??
+	String imgPath = "C:/Users/MJ/Desktop/이미지"; // 이미지 경로를 문자열로..지정??
 	JLabel jlb_id = new JLabel("아이디"); // "[입력]" : 문자열을 화면에 그림
 	JLabel jlb_pw = new JLabel("비밀번호"); // "[입력]" : 문자열을 화면에 그림
 	JLabel jlb_repw = new JLabel("비밀번호 재확인"); // "[입력]" : 문자열을 화면에 그림
@@ -39,11 +39,12 @@ public class SignUpView extends JFrame implements ActionListener {
 	ImageIcon ig = new ImageIcon(imgPath + "/main4.png");
 	boolean isIDCheck = false;
 	
-	TalkClient talkclient = TalkClient.getInstance();
-
+	Controller controller = null;
+	
 	// 생성자
 	public SignUpView() {
 		initDisplay();
+		this.controller = new Controller(this);
 	}
 
 	/* 배경이미지 */
@@ -105,15 +106,33 @@ public class SignUpView extends JFrame implements ActionListener {
 
 		// 가입하기 버튼
 		jbtn_ok.setBounds(105, 465, 120, 40);
+		jbtn_ok.setEnabled(false);
 		this.add(jbtn_ok);
 
 		// 버튼
 		jbtn_idcheck.setBounds(295, 135, 25, 25);
 		this.add(jbtn_idcheck);
 	}
-
-	
-	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// 중복아이디 없을 경우 1, 아이디 중복있어서 사용 못할 경우 -1
+		if (jbtn_idcheck == e.getSource()) {
+			System.out.println("중복검사 버튼 눌러짐"); // 단위테스트용
+			MemberVO pmVO = new MemberVO();
+			pmVO.setCommand("idcheck");
+			pmVO.setMem_id(getId());
+			controller.action(pmVO);
+		} // 회원가입 버튼 이벤트 처리
+		if (jbtn_ok == e.getSource()) {
+			System.out.println("회원가입 버튼 눌러짐"); // 단위테스트용	
+			MemberVO pmVO = new MemberVO();
+			pmVO.setCommand("signup");
+			pmVO.setMem_id(getId());
+			pmVO.setMem_pw(getPw());
+			pmVO.setMem_name(getName());
+			controller.action(pmVO);
+		}
+	}
 	public String getId() {
 		return jtf_id.getText();
 	}
@@ -138,9 +157,9 @@ public class SignUpView extends JFrame implements ActionListener {
 	public boolean spaceCheck() {
 		boolean result = true;
 		if (getId().length() == 0 ||
-			getPw().length() == 0 ||
-			getrePw().length() == 0 ||
-			getName().length() == 0) 
+				getPw().length() == 0 ||
+				getrePw().length() == 0 ||
+				getName().length() == 0) 
 		{ result = false; }
 		return result;
 	}
@@ -150,53 +169,5 @@ public class SignUpView extends JFrame implements ActionListener {
 			result = true;
 		}
 		return result;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// 중복아이디 없을 경우 1, 아이디 중복있어서 사용 못할 경우 -1
-		if (jbtn_idcheck == e.getSource()) {
-
-			System.out.println("중복검사 버튼 눌러짐"); // 단위테스트용
-			int result = talkclient.idCheck(getId()); // id 중복체크 메소드(Dao)
-			System.out.println("result 값 : "+result);
-			// 입력아이디 사용 가능(중복없음) = 1
-			if (result == 1) {
-				// 입력 아이디 사용가능
-				// 입력한 아이디는 사용 못해
-				// 다시 입력해야 된다.
-				successMsg("입력한 아이디는 사용할 수 있습니다.");
-				jtf_id.setEditable(false);
-				jbtn_idcheck.setEnabled(false);
-				isIDCheck = true;
-				jbtn_ok.setEnabled(isIDCheck);
-				return;
-			}else { // 입력아이디 사용 불가(중복있음) = -1
-				setId("");
-				errorMsg("입력하신 아이디는 이미 존재하는 아이디 입니다.");
-				return;
-			}
-		} // 회원가입 버튼 이벤트 처리
-		if (jbtn_ok == e.getSource()) {
-			System.out.println("회원가입 버튼 눌러짐"); // 단위테스트용
-			
-			// 중복검사 버튼이 눌러졌는 지 체크하는 조건문 추가해야함
-			// 모든 텍스트 필드들이 공백이 아닐때만 회원가입 처리(나중에 db에서 반환값 던져서 처리할 것)		
-			if (spaceCheck()) {
-				// 비밀번호 중복검사
-				if (passwordCheck()) {
-					talkclient.signUp(getId(), getPw(), getName());
-					successMsg("회원가입을 축하합니다!!");
-					new LoginView();
-					dispose();
-				} else {
-					errorMsg("입력한 비밀번호가 다릅니다. 확인 해주세요");
-					return;
-				}
-			} else {
-				errorMsg("빈칸이 있습니다. 모두 작성해 주세요.");
-				return;
-			}
-		}
 	}
 }

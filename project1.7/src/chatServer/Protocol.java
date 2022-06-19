@@ -10,13 +10,10 @@ public class Protocol {
 	public static final int ROOM_INLIST		= 140; 
 	public static final int MESSAGE 		= 200;
 	public static final int GROUP_MESSAGE   = 201;
-	public static final int NICNAME_CHANGE  = 202;
+	public static final int NICKNAME_CHANGE  = 202;
 	public static final int NOTICE		    = 203;
 	public static final int WHISHER 		= 209; 
 	public static final int CHANGE   		= 300; 
 	public static final int ROOM_OUT 		= 500;
 	public static final int EXPULSION   	= 501;
-	
-	//메시지열에서 값에 대한 구분값을 토큰으로 썰어서 사용하므로 이것도 변수로 처리하자.
-	public static final String seperator= "#"; 
 }
