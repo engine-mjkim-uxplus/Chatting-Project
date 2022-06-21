@@ -42,10 +42,13 @@ public class TalkServerView extends JFrame implements ActionListener {
 	DefaultTableModel 		  dtm 				     = 		new DefaultTableModel(data, cols);                                       
 	JTable 					  jtb 				     =		new JTable(dtm);                     
 	JScrollPane 			  jsp				     = 		new JScrollPane(jtb);                                           
-	SocketThread			  sk 					 =		null;                                     
+	SocketThread			  sk 					 =		null;      
 	///////////////////////////////////////////////////////////////////////////
+	MemSearchView 			  msView 				 = 		null;								
+	
 	///////////////////////////////생성자//////////////////////////////////////
 	public TalkServerView() {
+		this.msView = new MemSearchView();
 		initDisplay();
 		this.sk = new SocketThread(this); 
 		sk.start();
@@ -128,6 +131,8 @@ public class TalkServerView extends JFrame implements ActionListener {
 		// 회원조회 버튼 이벤트
 		else if(obj == jbtn_memSearch) {
 			System.out.println("회원조회 클릭됨"); // 만드는 중입니다
+			msView.initDisplay();
+			
 			
 		}
 		// 현재 접속자 버튼 이벤트

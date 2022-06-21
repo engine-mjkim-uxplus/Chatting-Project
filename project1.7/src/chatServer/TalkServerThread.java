@@ -27,10 +27,13 @@ public class TalkServerThread extends Thread {
 			ois = new ObjectInputStream(client.getInputStream());   // client소켓으로부터 인풋스트림 얻음
 			mvo = (MsgVO) ois.readObject(); 				// 사용자 nickName(JoptionPane) 읽어들임
 			nickName = mvo.getNickname(); 
-			view.jta_log.append(nickName + "님이 입장하였습니다.\n"); // 서버에 찍음
+			String days = sk.getDate();
+			String hours = sk.getTime();
+			view.jta_log.append("[" + days + hours + "]" 
+								    +nickName + "님이 입장하였습니다.\n"); // 서버에 찍음
 			for (TalkServerThread tst : sk.globalList) {
 				this.send(tst.mvo); // mvo에 프로토콜 100과 nickname 담겨있다
-			}										 		  // 방금 접속한 사용자에게 이전 접속자들 접속했다고 화면에 뛰운다
+			}						// 방금 접속한 사용자에게 이전 접속자들 접속했다고 화면에 뛰운다
 
 			// 현재 접속한 클라이언트의 닉네임, ip, 접속시간을 현재접속인원 창에 추가한다
 			InetAddress ip = client.getInetAddress();

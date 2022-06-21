@@ -6,6 +6,7 @@ public class MemberVO implements Serializable{
 	private String mem_id       = null;
 	private String mem_pw       = null;
 	private String mem_name     = null;
+	private String mem_phone	= null;
 	private String command 	    = null;	
 	private int	   result		= 0;
 	public String getMem_id() {
@@ -37,6 +38,12 @@ public class MemberVO implements Serializable{
 	}
 	public void setResult(int result) {
 		this.result = result;
+	}
+	public String getMem_phone() {
+		return mem_phone;
+	}
+	public void setMem_phone(String mem_phone) {
+		this.mem_phone = mem_phone;
 	}
 	
 }

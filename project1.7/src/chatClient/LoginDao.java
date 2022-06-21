@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import chatServer.ChatMsgVO;
@@ -22,7 +23,7 @@ public class LoginDao {
 		int result = 0;
 		String sql = "INSERT INTO MEMBER(ID,PW,NAME) VALUES(?,?,?)";
 		
-		con = DButil.getOracleConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
+		con = DButil.getConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
 		try {
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, pmVO.getMem_id());
@@ -53,7 +54,7 @@ public class LoginDao {
 		sql.append(" WHERE ROWNUM = 1                           ");
 		String result = "";
 
-		con = DButil.getOracleConnection();
+		con = DButil.getConnection();
 		try {
 			pstmt = con.prepareStatement(sql.toString());
 			pstmt.setString(1, pmVO.getMem_id());
@@ -88,7 +89,7 @@ public class LoginDao {
 		sql.append(" WHERE ROWNUM = 1									");
 		
 		String result = "";
-		con = DButil.getOracleConnection();
+		con = DButil.getConnection();
 		try {
 			pstmt = con.prepareStatement(sql.toString());
 			pstmt.setString(1, pmVO.getMem_id());

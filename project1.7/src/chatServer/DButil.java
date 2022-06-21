@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /*
  * DButil클래스는 connection을 매번하는게 번거롭기 때문에
@@ -21,14 +20,15 @@ public class DButil {
 	private static final String pwd = "111111";
 	private static final String driver = "oracle.jdbc.driver.OracleDriver";
 
-	public static Connection getOracleConnection() {
+	public static Connection getConnection() {
 		try {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, pwd);
+			System.out.println("연결 성공");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			System.out.println("연결에 실패하였습니다.");
+			System.out.println("연결 실패");
 		}
 		return con;
 	}
@@ -45,27 +45,29 @@ public class DButil {
 	}
 
 	// PreparedStatement, Connection 종료 메서드
-	public static void close(Connection con, PreparedStatement pst) {
+	public static void close(Connection con, PreparedStatement pstmt) {
 		if (con != null) {
 			try {
-				pst.close();
+				pstmt.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
+			}finally {
 			close(con);
+			}
 		}
 	}
 
 	// Connection, PreparedStatement , ResultSet 닫기
-	public static void close(Connection con, PreparedStatement pst, ResultSet rs) {
+	public static void close(Connection con, PreparedStatement pstmt, ResultSet rs) {
 		if (con != null) {
 			try {
 				rs.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 
+			}finally {
+			close(con, pstmt);
 			}
-			close(con, pst);
 		}
 
 	}

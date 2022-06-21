@@ -65,7 +65,7 @@ public class SocketThread extends Thread implements Serializable {
 		int yyyy = today.get(Calendar.YEAR);
 		int mm = today.get(Calendar.MONTH) + 1;
 		int day = today.get(Calendar.DAY_OF_MONTH);
-		return yyyy + "-" + (mm < 10 ? "0" + mm : "" + mm) + "-" + (day < 10 ? "0" + day : " " + day + " ");
+		return yyyy + "-" + (mm < 10 ? "0" + mm : "" + mm) + "-" + (day < 10 ? "0" + day : "" + day + " ");
 
 	}
 
