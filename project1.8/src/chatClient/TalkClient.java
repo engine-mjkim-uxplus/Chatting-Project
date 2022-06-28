@@ -93,7 +93,6 @@ public class TalkClient  {
 			for(PrivateChat pc : tct.prlist) {
 				// 액션이벤트 수동으로 발생시키기( 열려있는 개인대화방 종료 수행 )
 				pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
-				pc.dispose();
 			}
 		}
 		try {

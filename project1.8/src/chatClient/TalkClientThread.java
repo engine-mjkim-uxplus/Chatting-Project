@@ -1,5 +1,6 @@
 package chatClient;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -185,6 +186,13 @@ public class TalkClientThread extends Thread {
 					String nickName = mvo.getNickname();
 					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
 						chatView.successMsg("운영자에 의해 강퇴 당하셨습니다");
+						// 개인 대화방도 종료
+						if(prlist.size() != 0) {
+							for(PrivateChat pc : prlist) {
+								// 액션이벤트 수동으로 발생시키기( 열려있는 개인대화방 종료 수행 )
+								pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
+							}
+						}
 						chatView.dispose();
 					} else { // 다른 닉네임이면 강퇴 당한 아이디 채팅창에 그리고 대화목록에서 삭제
 						chatView.jta_display.append(nickName + "님이 운영자에 의해 강퇴당하셨습니다.\n");
