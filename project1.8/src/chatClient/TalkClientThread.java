@@ -8,14 +8,14 @@ import chatServer.Protocol;
 
 // 통신용 쓰레드 클래스 < 서버의 말을 듣는 역할을 한다 >
 public class TalkClientThread extends Thread {
-	ChatView chatview = null;
+	ChatView chatView = null;
 	TalkClient tc = null;
 	List<PrivateChat> prlist = null;  // 개인톡방 리스트
 	LoginDao loginDao = null;
 
-	public TalkClientThread(ChatView chatview) {
-		this.chatview = chatview;
-		this.tc = chatview.tc;
+	public TalkClientThread(TalkClient tc) {
+		this.chatView = tc.chatView;
+		this.tc = tc;
 		this.prlist =  new ArrayList<>();
 	}
 
@@ -40,17 +40,17 @@ public class TalkClientThread extends Thread {
 				case Protocol.ADMISSION: {// 100#apple
 					String nickName = mvo.getNickname();
 					System.out.println("단위테스트 닉네임은 " +nickName);
-					chatview.jta_display.append(nickName + "님이 입장하였습니다.\n");
+					chatView.jta_display.append(nickName + "님이 입장하였습니다.\n");
 					System.out.println(nickName + "님이 입장하였습니다");
 					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
 					v.add(nickName);
-					chatview.dtm.addRow(v); /// 접속인원 보여주는 dtm에 닉네임 추가
+					chatView.dtm.addRow(v); /// 접속인원 보여주는 dtm에 닉네임 추가
 				}	break;
 				
 				// 방생성 요청
 				case Protocol.ROOM_CREATE:{
 					String nickName = mvo.getNickname(); // name은 요청한 사람의 닉네임
-					int result = chatview.private_chat(nickName);
+					int result = chatView.private_chat(nickName);
 					if(result == 1) {
 						msg = "수락";
 						tc.roomCreate_response(nickName, msg);
@@ -94,7 +94,7 @@ public class TalkClientThread extends Thread {
 							System.out.println(list.size());
 						} 
 					} else {
-						chatview.errorMsg("상대방이 요청을 거절하였습니다.");
+						chatView.errorMsg("상대방이 요청을 거절하였습니다.");
 					}
 					
 				} break;
@@ -117,8 +117,8 @@ public class TalkClientThread extends Thread {
 				case Protocol.GROUP_MESSAGE: {
 					String nickName = mvo.getNickname();
 					String message =  mvo.getMsg();
-					chatview.jta_display.append("[" + nickName + "]" + message + "\n");
-					chatview.jta_display.setCaretPosition(chatview.jta_display.getDocument().getLength());
+					chatView.jta_display.append("[" + nickName + "]" + message + "\n");
+					chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
 				}
 					break;
 				// 대화명변경 (프로토콜 202)
@@ -127,19 +127,19 @@ public class TalkClientThread extends Thread {
 					String afterName = mvo.getAfter_nickname();
 					String message = mvo.getMsg();
 					// 테이블에 대화명 변경하기
-					for (int i = 0; i < chatview.dtm.getRowCount(); i++) {
-						String imsi = (String) chatview.dtm.getValueAt(i, 0);
+					for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
+						String imsi = (String) chatView.dtm.getValueAt(i, 0);
 						if (nickName.equals(imsi)) {
-							chatview.dtm.setValueAt(afterName, i, 0);
+							chatView.dtm.setValueAt(afterName, i, 0);
 							break;
 						}
 					}
 					// 채팅창에 타이틀바에도 대화명을 변경처리 한다.
 					if (nickName.equals(tc.nickName)) {
-						chatview.setTitle(afterName + "님의 대화창");
-						chatview.nickName = afterName;
+						chatView.setTitle(afterName + "님의 대화창");
+						chatView.nickName = afterName;
 					}
-					chatview.jta_display.append(message + "\n");
+					chatView.jta_display.append(message + "\n");
 				}
 					break;
 				// 서버에서 공지사항 보냄(프로토콜 203)
@@ -147,8 +147,8 @@ public class TalkClientThread extends Thread {
 					String nickName = mvo.getNickname();
 					String notice = mvo.getMsg();
 					String n = "[" + nickName + "]" + notice;
-					chatview.jta_display.setCaretPosition(chatview.jta_display.getDocument().getLength());
-					chatview.successMsg(n);
+					chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
+					chatView.successMsg(n);
 				}
 					break;
 				// 개인 대화방 나감
@@ -169,12 +169,12 @@ public class TalkClientThread extends Thread {
 				case Protocol.ROOM_OUT: {
 					String nickName = mvo.getNickname();
 					msg = mvo.getMsg();
-					chatview.jta_display.append(msg);
-					chatview.jta_display.setCaretPosition(chatview.jta_display.getDocument().getLength());
-					for (int i = 0; i < chatview.dtm.getRowCount(); i++) {
-						String n = (String) chatview.dtm.getValueAt(i, 0);
+					chatView.jta_display.append(msg);
+					chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
+					for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
+						String n = (String) chatView.dtm.getValueAt(i, 0);
 						if (n.equals(nickName)) {
-							chatview.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
+							chatView.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
 						}
 					} 
 					
@@ -184,15 +184,15 @@ public class TalkClientThread extends Thread {
 				case Protocol.EXPULSION: {
 					String nickName = mvo.getNickname();
 					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
-						chatview.successMsg("운영자에 의해 강퇴 당하셨습니다");
-						chatview.dispose();
+						chatView.successMsg("운영자에 의해 강퇴 당하셨습니다");
+						chatView.dispose();
 					} else { // 다른 닉네임이면 강퇴 당한 아이디 채팅창에 그리고 대화목록에서 삭제
-						chatview.jta_display.append(nickName + "님이 운영자에 의해 강퇴당하셨습니다.\n");
-						chatview.jta_display.setCaretPosition(chatview.jta_display.getDocument().getLength());
-						for (int i = 0; i < chatview.dtm.getRowCount(); i++) {
-							String n = (String) chatview.dtm.getValueAt(i, 0);
+						chatView.jta_display.append(nickName + "님이 운영자에 의해 강퇴당하셨습니다.\n");
+						chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
+						for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
+							String n = (String) chatView.dtm.getValueAt(i, 0);
 							if (n.equals(nickName)) {
-								chatview.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
+								chatView.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
 							}
 						}
 
@@ -202,7 +202,7 @@ public class TalkClientThread extends Thread {
 
 				}//////////// end of switch
 			} catch (Exception e) {
-			
+				e.printStackTrace();
 			}
 		} //////////////////// end of while
 	}

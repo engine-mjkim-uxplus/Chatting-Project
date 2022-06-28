@@ -58,14 +58,16 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	
 	// ChatView가 실행되면서 동시에 TalkClienThread가 생성되고
 	// run()메소드로 쓰레드가 실행됩니다.
-	public ChatView(TalkClient tc) {
+	public ChatView(String nickName) {
+		this.nickName = nickName;
 		JFrame.setDefaultLookAndFeelDecorated(true);
+		TalkClient tc = new TalkClient(this, nickName);
 		this.tc = tc;
-		this.nickName =tc.nickName;
-		TalkClientThread tct = new TalkClientThread(this);
-		tct.start();
 		initDisplay(true);
+		tc.init();
 	}
+	
+	
 	
 	public void initDisplay(boolean is) {
 		/////////////////////////배경 이미지/////////////////////////////
@@ -164,11 +166,6 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 		// ROOM_OUT
 		} else if (jbtn_exit == obj) {
 		tc.roomOut();
-//		if(tct.prlist.size() != 0) {
-//			for(PrivateChat pc : tct.prlist) {
-//				pc.dispose();
-//			}
-//		}
 		System.exit(0);
 		// NICKNAME_CHANGE
 		} else if (jbtn_change == obj) {
@@ -181,12 +178,16 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 			}
 		// ROOM_CREATE
 		} else if (jbtn_whisper == obj) { // 1대1 대화 신청
-			int select = jtb.getSelectedRow();
-			String otnickName = (String)jtb.getValueAt(select, 0);
-			if(nickName.equals(otnickName)) {
-				errorMsg("본인에게는 신청할 수 없습니다");
+			if(jtb.getSelectedRow() > -1) {
+				int select = jtb.getSelectedRow();
+				String otnickName = (String)jtb.getValueAt(select, 0);
+				if(nickName.equals(otnickName)) {
+					errorMsg("본인에게는 신청할 수 없습니다");
+				} else {
+					tc.roomCreate(otnickName);
+				}
 			}else
-			tc.roomCreate(otnickName);
+				errorMsg("대화상대를 선택해 주세요");
 		}
 	}////////////////////// end of actionPerformed
 

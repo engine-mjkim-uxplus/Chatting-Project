@@ -10,16 +10,17 @@ import chatServer.Protocol;
 // 로그인 후 단톡 채팅방 UI 및 클라이언트 소켓 생성클래스
 // 클라이언트와 서버와의 통신용만으로 쓸 것임
 // 통신용 컨트롤러 역할
-public class TalkClient {
+public class TalkClient  {
 	//////////////// 통신과 관련한 전역변수 추가 시작//////////////
 	Socket socket = null;
 	ObjectOutputStream oos = null;// 말 하고 싶을 때
 	ObjectInputStream ois = null;// 듣기 할 때
 	String nickName = null;// 닉네임 등록
-
+	ChatView chatView = null;
 	//////////////// 통신과 관련한 전역변수 추가 끝 //////////////
-
-	public TalkClient(String nickName) {
+	TalkClientThread tct = null;
+	public TalkClient(ChatView chatView, String nickName) {
+		this.chatView = chatView;
 		this.nickName = nickName;
 	}
 
@@ -39,6 +40,8 @@ public class TalkClient {
 			mvo.setProtocol(Protocol.ADMISSION);
 			mvo.setNickname(nickName);
 			oos.writeObject(mvo);
+			this.tct = new TalkClientThread(this);
+			this.tct.start();
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
@@ -82,8 +85,15 @@ public class TalkClient {
 
 	// 대화방 나가기 (Protocol.ROOM_OUT)
 	public void roomOut() {
+		// 현재 대화중인 개인 대화방도 종료
+		if(tct.prlist.size() != 0) {
+			for(PrivateChat pc : tct.prlist) {
+				pc.dispose();
+			}
+		}
 		try {
 			MsgVO mvo = new MsgVO();
+			mvo.setNickname(nickName);
 			mvo.setProtocol(Protocol.ROOM_OUT);
 			mvo.setMsg(nickName + "님이 퇴장하였습니다.");
 			oos.writeObject(mvo);
@@ -91,6 +101,7 @@ public class TalkClient {
 			e.printStackTrace();
 		}
 	}
+	// 개인 대화방 나가기
 	public void prRoomOut(String otNickName, int roomnum) {
 		try {
 			MsgVO mvo = new MsgVO();

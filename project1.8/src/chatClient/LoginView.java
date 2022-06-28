@@ -127,9 +127,7 @@ public class LoginView extends JFrame implements ActionListener {
 						errorMsg("존재하지 않는 아이디입니다.");
 						return;
 					}else {
-						TalkClient tc = new TalkClient(nickName);
-						new ChatView(tc);
-						tc.init();
+						new ChatView(nickName);
 						dispose();
 					}
 			} else if (jtf_id.getText().equals("")) {
