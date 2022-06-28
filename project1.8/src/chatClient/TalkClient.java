@@ -91,7 +91,7 @@ public class TalkClient  {
 		// 현재 대화중인 개인 대화방도 종료
 		if(tct.prlist.size() != 0) {
 			for(PrivateChat pc : tct.prlist) {
-				// 액션이벤트 수동으로 발생시키기
+				// 액션이벤트 수동으로 발생시키기( 열려있는 개인대화방 종료 수행 )
 				pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
 				pc.dispose();
 			}
@@ -150,7 +150,7 @@ public class TalkClient  {
 		try {
 			MsgVO mvo = new MsgVO();
 			mvo.setOtNickname(nickName); // 대화 요청한 사람의 닉네임
-			mvo.setMsg(msg);		   // 수락 || 거절
+			mvo.setMsg(msg);		     // 수락 || 거절
 			mvo.setProtocol(Protocol.ROOM_ACCEPT);
 			oos.writeObject(mvo);
 			
@@ -158,7 +158,7 @@ public class TalkClient  {
 			e.printStackTrace();
 		}
 	}
-	// 개인 대화방 열려있는지 체크
+	// 개인 대화방 열려 있는지 체크
 	public boolean isRoom(String otnickName) {
 		boolean isRoom = true;
 		

@@ -105,7 +105,7 @@ public class TalkClientThread extends Thread {
 					String message = mvo.getMsg();
 					int roomNum    =  mvo.getRoomNum();
 					for(PrivateChat prc : prlist) {
-						if(prc.roomNum == roomNum) {
+						if(prc.getRoomNum() == roomNum) {
 							prc.jta_display.append("[" + nickName + "]" + message + "\n");
 							prc.jta_display.setCaretPosition(prc.jta_display.getDocument().getLength());
 						}
@@ -156,7 +156,7 @@ public class TalkClientThread extends Thread {
 					int roomNum = mvo.getRoomNum();
 					String message = mvo.getMsg();
 					for(PrivateChat prc : prlist) {
-						if(prc.roomNum == roomNum) {
+						if(prc.getRoomNum() == roomNum) {
 							prc.errorMsg(message);
 							prc.dispose();
 							prlist.remove(prc);

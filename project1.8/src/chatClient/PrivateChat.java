@@ -24,7 +24,7 @@ public class PrivateChat extends JFrame implements ActionListener{
 	TalkClientThread tct 	 		 = 		null;
 	String 		     nickName  		 = 		null;   // 나의 닉네임
 	String 			 otNickName 	 = 		null; // 다른사람 닉네임
-	public int 		 roomNum 		 = 		0;	  // private으로 변경 해야함. getter로 얻도록 설정할 것
+	private int 	 roomNum 		 = 		0;	  // private으로 변경 해야함. getter로 얻도록 설정할 것
 	
 /////////////////////////////////////////////////////////////////////////	
 	
