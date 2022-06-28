@@ -1,5 +1,6 @@
 package chatClient;
 
+import java.awt.event.ActionEvent;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -19,6 +20,7 @@ public class TalkClient  {
 	ChatView chatView = null;
 	//////////////// 통신과 관련한 전역변수 추가 끝 //////////////
 	TalkClientThread tct = null;
+	
 	public TalkClient(ChatView chatView, String nickName) {
 		this.chatView = chatView;
 		this.nickName = nickName;
@@ -88,6 +90,8 @@ public class TalkClient  {
 		// 현재 대화중인 개인 대화방도 종료
 		if(tct.prlist.size() != 0) {
 			for(PrivateChat pc : tct.prlist) {
+				// 액션이벤트 수동으로 발생시키기
+				pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
 				pc.dispose();
 			}
 		}
@@ -153,7 +157,7 @@ public class TalkClient  {
 			e.printStackTrace();
 		}
 	}
-	
+	// 개인 대화방 열려있는지 체크
 	public boolean isRoom(String otnickName) {
 		boolean isRoom = true;
 		

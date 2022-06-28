@@ -110,8 +110,9 @@ public class PrivateChat extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		Object obj = ae.getSource();
+		
 		// 메시지 보내기
-		if (jtf_msg == obj) {
+		if (jtf_msg == obj || jbtn_send == obj) {
 			String msg = jtf_msg.getText();
 			tc.privateMsg(msg,roomNum,otNickName);
 			jtf_msg.setText("");
