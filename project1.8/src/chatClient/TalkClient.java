@@ -154,5 +154,16 @@ public class TalkClient  {
 		}
 	}
 	
+	public boolean isRoom(String otnickName) {
+		boolean isRoom = true;
+		
+		for(PrivateChat pr :tct.prlist) {
+			if(otnickName.equals(pr.otNickName)) {
+				return false;
+			} 
+		}
+		return isRoom;
+	}
+	
 
 }

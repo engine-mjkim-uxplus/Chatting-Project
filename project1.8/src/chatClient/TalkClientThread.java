@@ -39,7 +39,6 @@ public class TalkClientThread extends Thread {
 				switch (protocol) {
 				case Protocol.ADMISSION: {// 100#apple
 					String nickName = mvo.getNickname();
-					System.out.println("단위테스트 닉네임은 " +nickName);
 					chatView.jta_display.append(nickName + "님이 입장하였습니다.\n");
 					System.out.println(nickName + "님이 입장하였습니다");
 					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
@@ -64,15 +63,15 @@ public class TalkClientThread extends Thread {
 					loginDao = new LoginDao();
 					msg = mvo.getMsg();
 					int isroomNum = mvo.getIsroomNum();      // 대화방 유무, 있을 경우 방번호로 사용
-					int roomNum = 0;					     // 방이 없었을 경우 방번호로 사용	
+					int roomNum = mvo.getRoomNum();	
+					// 방이 없었을 경우 방번호로 사용	
 					String nickName = mvo.getNickname(); 	 // 본인 닉네임
 					String otnickName = mvo.getOtNickname(); // 다른 사람 닉네임
-					System.out.println(isroomNum + "번을 서버에서 전달 받았습니다");
+					System.out.println(roomNum + "번을(rnum) 서버에서 전달 받았습니다");
+					System.out.println(isroomNum + "번을(isnum)서버에서 전달 받았습니다");
 					if(msg.equals("수락")) {
 						// 대화방이 없을 경우
 						if(isroomNum == 0) {
-						// 룸 번호 조회
-						roomNum	= loginDao.searchRoomNum(otnickName,nickName);
 						System.out.println(roomNum+ "번 방의 뷰를 실행합니다");
 						System.out.println("받은 닉네임은 " + nickName);
 						PrivateChat pc = new PrivateChat(this,roomNum, nickName, otnickName);

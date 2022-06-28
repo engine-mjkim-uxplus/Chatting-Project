@@ -101,38 +101,41 @@ public class TalkServerThread extends Thread {
 				// 개인 대화방 요청 수락( 0: 방없음 ) 
 				case Protocol.ROOM_ACCEPT:{
 					String otnickName  = mvo.getOtNickname(); // 대화 요청한 사람의 닉네임
+					int roomNum = 0;
+					int isroomNum = 0;
 					if(mvo.getMsg().equals("수락")) {
 						// 방의 유무 조회
-						int isroomNum = chatDao.searchRoomNum(otnickName,nickName); 
+						isroomNum = chatDao.searchRoomNum(otnickName,nickName); 
 						System.out.println("방의 유무는 "+isroomNum+ "번 입니다"); // 단위테스트
 						//방이 없으면 방번호 생성해서 클라이언트 쓰레드에게 전달
 						if(isroomNum == 0) {
-							chatDao.createRoomNum(otnickName, nickName); // 방생성
+							chatDao.createRoomNum(otnickName, nickName); 		 // 방생성
+							roomNum = chatDao.searchRoomNum(otnickName,nickName);// 생성된 방번호 조회
 							for(TalkServerThread tst :sk.globalList ) {
 								if(tst.nickName.equals(otnickName)) { 
 									mvo.setOtNickname(nickName); // 수락한 사람 닉네임
 									mvo.setNickname(otnickName); // 자기자신
-									mvo.setRoomNum(isroomNum);   // 방의상태(유무)
+									mvo.setRoomNum(roomNum);   // 방의상태(유무)
+									mvo.setIsroomNum(isroomNum);
 									tst.send(mvo);
 									break;
 								}
 							}
+							mvo.setRoomNum(roomNum);
 							mvo.setOtNickname(otnickName); // 수락한 사람 닉네임
 							mvo.setNickname(nickName); // 자기자신
 							mvo.setIsroomNum(isroomNum);
 							send(mvo); // 자기 자신에게도 보낸다
 						} // 방이 이미 있을 경우 
 						else if(isroomNum != 0) {
-							mvo.setOtNickname(otnickName); // 수락한 사람 닉네임
-							mvo.setNickname(nickName); // 자기자신
+							// 자기 자신에게 보내기
 							mvo.setIsroomNum(isroomNum);
-							send(mvo); // 자기 자신에게도 보낸다
-							
+							send(mvo); 
+							// 상대방에게 보내기
 							for(TalkServerThread tst :sk.globalList ) {
 								if(tst.nickName.equals(otnickName)) { 
 									mvo.setOtNickname(nickName); // 수락한 사람 닉네임
 									mvo.setNickname(otnickName); // 자기자신
-									mvo.setRoomNum(isroomNum);   // 방의상태(유무)
 									tst.send(mvo);
 									break;
 								}
