@@ -12,6 +12,7 @@ public class TalkClientThread extends Thread {
 	TalkClient tc = null;
 	List<PrivateChat> prlist = null;  // 개인톡방 리스트
 	LoginDao loginDao = null;
+	boolean isStop;
 
 	public TalkClientThread(TalkClient tc) {
 		this.chatView = tc.chatView;
@@ -28,7 +29,7 @@ public class TalkClientThread extends Thread {
 	// 이 쓰레드는 swicth문에서 전달 받은 프로토콜에 맞는 메시지가 사용자 화면에 출력된다.
 
 	public void run() {
-		boolean isStop = false;
+		isStop = false;
 		MsgVO mvo = new MsgVO();
 		String msg = null;
 		int protocol = 0;

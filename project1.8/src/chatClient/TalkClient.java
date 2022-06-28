@@ -87,6 +87,7 @@ public class TalkClient  {
 
 	// 대화방 나가기 (Protocol.ROOM_OUT)
 	public void roomOut() {
+		tct.isStop = true; // 쓰레드 종료되도록( ★자원 반납★ ) 
 		// 현재 대화중인 개인 대화방도 종료
 		if(tct.prlist.size() != 0) {
 			for(PrivateChat pc : tct.prlist) {

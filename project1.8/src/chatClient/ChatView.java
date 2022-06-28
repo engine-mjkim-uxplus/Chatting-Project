@@ -166,6 +166,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 		// ROOM_OUT
 		} else if (jbtn_exit == obj) {
 		tc.roomOut();
+		
 		System.exit(0);
 		// NICKNAME_CHANGE
 		} else if (jbtn_change == obj) {
