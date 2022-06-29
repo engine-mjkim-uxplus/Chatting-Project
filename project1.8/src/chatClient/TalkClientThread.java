@@ -65,8 +65,7 @@ public class TalkClientThread extends Thread {
 					loginDao = new LoginDao();
 					msg = mvo.getMsg();
 					int isroomNum = mvo.getIsroomNum();      // 대화방 유무, 있을 경우 방번호로 사용
-					int roomNum = mvo.getRoomNum();	
-					// 방이 없었을 경우 방번호로 사용	
+					int roomNum = mvo.getRoomNum();		
 					String nickName = mvo.getNickname(); 	 // 본인 닉네임
 					String otnickName = mvo.getOtNickname(); // 다른 사람 닉네임
 					System.out.println(roomNum + "번을(rnum) 서버에서 전달 받았습니다");
