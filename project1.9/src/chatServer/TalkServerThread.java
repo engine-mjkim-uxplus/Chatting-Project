@@ -159,7 +159,8 @@ public class TalkServerThread extends Thread {
 						} 
 					}
 					send(mvo); // 자기 자신에게도 보낸다
-					chatDao.prchatMsg(message, roomNum, days, hours); // 대화내용 DB에 저장
+					ChatMsgVO cvo = new ChatMsgVO(message, roomNum, days, hours);
+					chatDao.prchatMsg(cvo); // 대화내용 DB에 저장
 				}
 				break;
 				// 단체 대화 전달
@@ -169,15 +170,15 @@ public class TalkServerThread extends Thread {
 					String days = sk.getDate();
 					String hours = sk.getTime();
 					broadCasting(mvo);
-
-					chatDao.chatMsg(message, nickName, days, hours); // 대화내용 DB 테이블에 기록
+					ChatMsgVO cvo = new ChatMsgVO(message, nickName, days, hours);
+					
+					chatDao.chatMsg(cvo); // 대화내용 DB 테이블에 기록
 				} break;
 				// 대화명 변경에 대해 단체로 전달
 				case Protocol.NICKNAME_CHANGE: {
 					this.nickName = mvo.getAfter_nickname();
 					broadCasting(mvo);
 				} break;
-				
 				// 개인 대화방 퇴장 시
 				case Protocol.PRROOM_OUT: {
 					String otNickname= mvo.getOtNickName();
@@ -187,8 +188,7 @@ public class TalkServerThread extends Thread {
 							break;
 						} 
 					}
-				} break;
-				
+				} break;		
 				// 클라이언트 강퇴 시
 				case Protocol.EXPULSION_RESPONSE:{
 					broadCasting(mvo);

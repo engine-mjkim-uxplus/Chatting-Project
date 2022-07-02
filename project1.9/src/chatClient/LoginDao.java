@@ -128,10 +128,10 @@ public class LoginDao {
 	
 	public List<MsgVO> prchatBring(int roomnum) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT CHATMSG		    ");
-		sql.append("		FROM PRIVATECHAT");
-		sql.append("	WHERE ROOMNUM = ?   ");
-		sql.append(" ORDER BY DAYS, HOURS	");
+		sql.append("SELECT CHATMSG		        ");
+		sql.append("		FROM PRIVATE_MSG_LOG");
+		sql.append("	WHERE ROOMNUM = ?       ");
+		sql.append(" ORDER BY DAYS, HOURS	    ");
         
         con = DButil.getConnection();
 		try {

@@ -3,6 +3,7 @@ package chatServer;
 public class ChatMsgVO {
 	private String chatmsg;
 	private String nicname;
+	private int    roomnum;
 	private String days; 
 	private String hours;
 	
@@ -15,6 +16,13 @@ public class ChatMsgVO {
 		super();
 		this.chatmsg = chatmsg;
 		this.nicname = nicname;
+		this.days = days;
+		this.hours = hours;
+	}
+	public ChatMsgVO(String chatmsg, int roomnum, String days, String hours) {
+		super();
+		this.chatmsg = chatmsg;
+		this.roomnum = roomnum;
 		this.days = days;
 		this.hours = hours;
 	}
@@ -49,6 +57,16 @@ public class ChatMsgVO {
 
 	public void setHours(String hours) {
 		this.hours = hours;
+	}
+
+
+	public int getRoomnum() {
+		return roomnum;
+	}
+
+
+	public void setRoomnum(int roomnum) {
+		this.roomnum = roomnum;
 	} 
 	
 	

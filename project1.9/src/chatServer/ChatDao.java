@@ -16,19 +16,23 @@ public class ChatDao {
 	PreparedStatement pstmt;
 	ResultSet rs;
 	List<MsgVO> list;
-
-	// 대화내용 테이블에 저장	
-	public void chatMsg(String nickName, String msg, String days, String hours) {
+	/**************************************************************************
+	 * 단체 대화방 메시지 저장 메소드
+	 * @param msg
+	 * @param days
+	 * @param hours
+	 **************************************************************************/
+	public void chatMsg(ChatMsgVO cvo) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("insert into chatlog values(?,?,?,?)");
+		sql.append("insert into GROUP_MSG_LOG values(?,?,?,?)");
 
 		con = DButil.getConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
 		try {
 			pstmt = con.prepareStatement(sql.toString());
-			pstmt.setString(1, nickName);
-			pstmt.setString(2, msg);
-			pstmt.setString(3, days);
-			pstmt.setString(4, hours);
+			pstmt.setString(1, cvo.getChatmsg());
+			pstmt.setString(2, cvo.getNicname());
+			pstmt.setString(3, cvo.getDays());
+			pstmt.setString(4, cvo.getHours());
 			int i = pstmt.executeUpdate(); // exceuteUpdate해줘야 쿼리문 실행
 			System.out.println(" 데이터 " + i + "건이 추가되었습니다."); ////////// Test
 		} catch (SQLException se) {
@@ -101,7 +105,7 @@ public class ChatDao {
 	***************************************************************************/
 	public void createRoomNum(String name1, String name2) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("INSERT INTO CHATROOM (ROOMNUM, NAME1, NAME2 ) ");
+		sql.append("INSERT INTO PRIVATE_ROOM (ROOMNUM, NAME1, NAME2 ) ");
 		sql.append("VALUES(ROOMNUM_SEQ.NEXTVAL, ?, ?  )          ");
 
 		con = DButil.getConnection();
@@ -131,18 +135,18 @@ public class ChatDao {
 		int roomNum = 0;
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT ROOMNUM                               ");
-		sql.append("FROM (                                       ");
-		sql.append("            SELECT ROOMNUM                   ");
-		sql.append("                            FROM CHATROOM    ");
-		sql.append("                    WHERE NAME1 = ? 	     ");
-		sql.append("                        AND NAME2 = ? 	     ");
-		sql.append("                    UNION ALL                ");
-		sql.append("            SELECT ROOMNUM                   ");
-		sql.append("                            FROM CHATROOM    ");
-		sql.append("                    WHERE NAME1 = ?     	 ");
-		sql.append("                        AND NAME2 = ?      	 ");
-		sql.append("               )                             ");
+		sql.append("SELECT ROOMNUM                                ");
+		sql.append("FROM (                                        ");
+		sql.append("            SELECT ROOMNUM                    ");
+		sql.append("                            FROM PRIVATE_ROOM ");
+		sql.append("                    WHERE NAME1 = ? 	      ");
+		sql.append("                        AND NAME2 = ? 	      ");
+		sql.append("                    UNION ALL                 ");
+		sql.append("            SELECT ROOMNUM                    ");
+		sql.append("                            FROM PRIVATE_ROOM ");
+		sql.append("                    WHERE NAME1 = ?     	  ");
+		sql.append("                        AND NAME2 = ?      	  ");
+		sql.append("               )                              ");
 		con = DButil.getConnection();
 		try {
 			pstmt = con.prepareStatement(sql.toString());
@@ -170,18 +174,17 @@ public class ChatDao {
 	 * @param days		: 날짜
 	 * @param hours     : 시간
 	 ***************************************************************************/
-	public void prchatMsg(String msg, int roomNum, String days, String hours) {
+	public void prchatMsg(ChatMsgVO cvo) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("insert into privatechat values(?,?,?,?)");
+		sql.append("insert into PRIVATE_MSG_LOG values(?,?,?,?)");
 
 		con = DButil.getConnection(); // DButil에서 예외처리 했으므로 따로 해주지 않아도 됨
 		try {
 			pstmt = con.prepareStatement(sql.toString());
-			pstmt.setString(1, msg);
-			pstmt.setInt(2, roomNum);
-			pstmt.setString(3, days);
-			pstmt.setString(4, hours);
-			System.out.println("DB에 대화내용 저장 중이니?");
+			pstmt.setString(1, cvo.getChatmsg());
+			pstmt.setInt(2, cvo.getRoomnum());
+			pstmt.setString(3, cvo.getDays());
+			pstmt.setString(4, cvo.getHours());
 			int i = pstmt.executeUpdate(); 
 			System.out.println(" 데이터 " + i + "건이 추가되었습니다."); ////////// Test
 		} catch (SQLException se) {
