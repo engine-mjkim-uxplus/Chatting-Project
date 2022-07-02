@@ -85,34 +85,59 @@ public class TalkClient  {
 		}
 	}
 
-	// 대화방 나가기 (Protocol.ROOM_OUT)
+	// 단체 대화방 퇴장 시(Protocol.ROOM_OUT)
 	public void roomOut() {
-		tct.isStop = true; // 쓰레드 종료되도록( ★자원 반납★ ) 
-		// 현재 대화중인 개인 대화방도 종료
+		// 현재 대화중인 개인 대화방 종료
 		if(tct.prlist.size() != 0) {
 			for(PrivateChat pc : tct.prlist) {
-				// 액션이벤트 수동으로 발생시키기( 열려있는 개인대화방 종료 수행 )
-				pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
+				String otnickName= pc.otNickName;
+				int roomnum = pc.getRoomNum();
+				prRoomOut(otnickName, roomnum);
 			}
 		}
 		try {
 			MsgVO mvo = new MsgVO();
 			mvo.setNickname(nickName);
 			mvo.setProtocol(Protocol.ROOM_OUT);
-			mvo.setMsg(nickName + "님이 퇴장하였습니다.");
+			mvo.setMsg(nickName + "님이 퇴장하셨습니다.");
+			oos.writeObject(mvo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		tct.isStop = true; // 쓰레드 종료되도록( ★자원 반납★ ) /////////테스트중
+	}
+	// 대화방 생성
+	public void roomCreate(String nickName) {
+		try {
+			MsgVO mvo = new MsgVO();
+			mvo.setNickname(nickName); // 받는 사람 이름 세팅
+			mvo.setProtocol(Protocol.ROOM_CREATE);
 			oos.writeObject(mvo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	// 개인 대화방 나가기
-	public void prRoomOut(String otNickName, int roomnum) {
+	// 개인 대화방 퇴장 시
+	public void prRoomOut(String otnickName, int roomnum) {
 		try {
 			MsgVO mvo = new MsgVO();
-			mvo.setOtNickname(otNickName);
+			mvo.setNickname(nickName);
+			mvo.setOtNickname(otnickName);
 			mvo.setRoomNum(roomnum);
-			mvo.setMsg(nickName + "님이 나가셨습니다");
+			mvo.setMsg(nickName + "님이 퇴장하셨습니다");
 			mvo.setProtocol(Protocol.PRROOM_OUT);
+			oos.writeObject(mvo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	// 강퇴시 개인 화면 닫기
+	public void expulsion() {
+		try {
+			MsgVO mvo = new MsgVO();
+			mvo.setNickname(nickName);
+			mvo.setMsg("운영자가 " +nickName + "님을 강퇴하였습니다");
+			mvo.setProtocol(Protocol.EXPULSION_RESPONSE);
 			oos.writeObject(mvo);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -132,17 +157,6 @@ public class TalkClient  {
 			e.printStackTrace();
 		}
 
-	}
-	// 대화방 생성
-	public void roomCreate(String nickName) {
-		try {
-			MsgVO mvo = new MsgVO();
-			mvo.setNickname(nickName); // 받는 사람 이름 세팅
-			mvo.setProtocol(Protocol.ROOM_CREATE);
-			oos.writeObject(mvo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	//  대화방 요청에 대한 응답
 	public void roomCreate_response(String nickName, String msg) {
@@ -168,6 +182,5 @@ public class TalkClient  {
 		}
 		return isRoom;
 	}
-	
 
 }

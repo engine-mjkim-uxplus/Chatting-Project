@@ -182,7 +182,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 			if(jtb.getSelectedRow() > -1) {
 				int select = jtb.getSelectedRow();
 				String otnickName = (String)jtb.getValueAt(select, 0);
-				boolean isRoom = tc.isRoom(otnickName);
+				boolean isRoom = tc.isRoom(otnickName); // 대화방 유무 체크(있으면 flase)
 				if(isRoom) {
 					if(nickName.equals(otnickName)) {
 						errorMsg("본인에게는 신청할 수 없습니다");

@@ -77,10 +77,10 @@ public class TalkServerThread extends Thread {
 			run_start: while (!isStop) { 
 				mvo = (MsgVO) ois.readObject(); // 사용자에게 입력 받을 때 까지 기다린다.
 				String msg = mvo.getMsg();
-				if(msg != null) {
-					view.jta_log.append("[" + this.nickName +"] " + msg + "\n");
-					view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
-				}				
+//				if(msg != null) {
+//					view.jta_log.append("[" + this.nickName +"] " + msg + "\n");
+//					view.jta_log.setCaretPosition(view.jta_log.getDocument().getLength());
+//				}				
 				protocol = mvo.getProtocol();// 100 | 200 | 300 | 400 | 500
 					
 				switch (protocol) {
@@ -95,8 +95,7 @@ public class TalkServerThread extends Thread {
 							break;
 						}
 					}
-				}
-				break;	
+				} break;	
 				
 				// 개인 대화방 요청 수락( 0: 방없음 ) 
 				case Protocol.ROOM_ACCEPT:{
@@ -150,8 +149,7 @@ public class TalkServerThread extends Thread {
 							}
 						}	
 					}
-				}
-				break;
+				} break;
 				// 개인톡방 메시지 보내기
 				case Protocol.MESSAGE: {
 					String days = sk.getDate();
@@ -180,14 +178,14 @@ public class TalkServerThread extends Thread {
 					broadCasting(mvo);
 
 					chatDao.chatMsg(message, nickName, days, hours); // 대화내용 DB 테이블에 기록
-				}
-				break;
+				} break;
 				// 대화명 변경에 대해 단체로 전달
 				case Protocol.NICKNAME_CHANGE: {
 					this.nickName = mvo.getAfter_nickname();
 					broadCasting(mvo);
-				}
-					break;
+				} break;
+				
+				// 개인 대화방 퇴장 시
 				case Protocol.PRROOM_OUT: {
 					String otNickname= mvo.getOtNickname();
 					for(TalkServerThread tst :sk.globalList ) {
@@ -196,13 +194,20 @@ public class TalkServerThread extends Thread {
 							break;
 						} 
 					}
-				}
-				break;	
+				} break;
+				
+				// 클라이언트 강퇴 시
+				case Protocol.EXPULSION_RESPONSE:{
+					broadCasting(mvo);
+					sk.globalList.remove(this);
+					sk.userCount();
+				} break run_start; // 해당 자원 반납
+				
 				// 클라이언트 퇴장 시 (단체톡)
 				case Protocol.ROOM_OUT: { 
-					sk.globalList.remove(this); // 클라이언트 나갔으므로 통신 쓰레드 지움
 					broadCasting(mvo);
-					sk. showNumber_Conpeople();
+					sk.globalList.remove(this); // 클라이언트 나갔으므로 통신 쓰레드 지움
+					sk.showNumber_Conpeople();
 					sk.userCount(); // 접속인원 JTexField 초기화 
 				}
 				break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료

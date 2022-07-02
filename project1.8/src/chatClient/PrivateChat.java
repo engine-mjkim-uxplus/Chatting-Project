@@ -119,10 +119,12 @@ public class PrivateChat extends JFrame implements ActionListener{
 		}
 		// 채팅방 나가기
 		else if(jbtn_exit == obj){
+			// 상대방에게 나간 것 알리기
 			tc.prRoomOut(otNickName, roomNum);
-			for(PrivateChat prc : tct.prlist) {
-				if(prc.roomNum == roomNum) {
-					prc.remove(prc);
+			// 나의 대화방 종료
+			for(PrivateChat pc : tct.prlist) {
+				if(pc.roomNum == roomNum) {
+					tct.prlist.remove(pc);
 					break;
 				}
 			}

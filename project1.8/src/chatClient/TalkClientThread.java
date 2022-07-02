@@ -11,14 +11,15 @@ import chatServer.Protocol;
 public class TalkClientThread extends Thread {
 	ChatView chatView = null;
 	TalkClient tc = null;
-	List<PrivateChat> prlist = null;  // 개인톡방 리스트
+	List<PrivateChat> prlist = null; // 개인톡방 리스트
 	LoginDao loginDao = null;
 	boolean isStop;
 
 	public TalkClientThread(TalkClient tc) {
 		this.chatView = tc.chatView;
 		this.tc = tc;
-		this.prlist =  new ArrayList<>();
+		this.prlist = new ArrayList<>();
+		
 	}
 
 	/*
@@ -34,9 +35,9 @@ public class TalkClientThread extends Thread {
 		MsgVO mvo = new MsgVO();
 		String msg = null;
 		int protocol = 0;
-		while (!isStop) {
+		run_start: while (!isStop) {
 			try {
-				mvo = (MsgVO)tc.ois.readObject(); // 톡 서버쓰레드에서 넘어오는 메시지 기다리는중..
+				mvo = (MsgVO) tc.ois.readObject(); // 톡 서버쓰레드에서 넘어오는 메시지 기다리는중..
 				protocol = mvo.getProtocol(); // 프로토콜 읽어 들임
 				switch (protocol) {
 				case Protocol.ADMISSION: {// 100#apple
@@ -46,66 +47,69 @@ public class TalkClientThread extends Thread {
 					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
 					v.add(nickName);
 					chatView.dtm.addRow(v); /// 접속인원 보여주는 dtm에 닉네임 추가
-				}	break;
-				
+				}
+					break;
+
 				// 방생성 요청
-				case Protocol.ROOM_CREATE:{
+				case Protocol.ROOM_CREATE: {
 					String nickName = mvo.getNickname(); // name은 요청한 사람의 닉네임
 					int result = chatView.private_chat(nickName);
-					if(result == 1) {
+					if (result == 1) {
 						msg = "수락";
 						tc.roomCreate_response(nickName, msg);
-					}else {
+					} else {
 						msg = "거절";
 						tc.roomCreate_response(nickName, msg);
 					}
-				} break;
+				}
+					break;
 				// 방생성 요청에 대한 응답
-				case Protocol.ROOM_ACCEPT:{
+				case Protocol.ROOM_ACCEPT: {
 					loginDao = new LoginDao();
 					msg = mvo.getMsg();
-					int isroomNum = mvo.getIsroomNum();      // 대화방 유무, 있을 경우 방번호로 사용
-					int roomNum = mvo.getRoomNum();		
-					String nickName = mvo.getNickname(); 	 // 본인 닉네임
+					int isroomNum = mvo.getIsroomNum(); // 대화방 유무, 있을 경우 방번호로 사용
+					int roomNum = mvo.getRoomNum();
+					String nickName = mvo.getNickname(); // 본인 닉네임
 					String otnickName = mvo.getOtNickname(); // 다른 사람 닉네임
 					System.out.println(roomNum + "번을(rnum) 서버에서 전달 받았습니다");
 					System.out.println(isroomNum + "번을(isnum)서버에서 전달 받았습니다");
-					if(msg.equals("수락")) {
+					if (msg.equals("수락")) {
 						// 대화방이 없을 경우
-						if(isroomNum == 0) {
-						System.out.println(roomNum+ "번 방의 뷰를 실행합니다");
-						System.out.println("받은 닉네임은 " + nickName);
-						PrivateChat pc = new PrivateChat(this,roomNum, nickName, otnickName);
-						prlist.add(pc);
+						if (isroomNum == 0) {
+							System.out.println(roomNum + "번 방의 뷰를 실행합니다");
+							System.out.println("받은 닉네임은 " + nickName);
+							PrivateChat pc = new PrivateChat(this, roomNum, nickName, otnickName);
+							prlist.add(pc);
 						}
 						// 대화방이 있을 경우
-						else if(isroomNum != 0 ) {
+						else if (isroomNum != 0) {
 							List<MsgVO> list = null;
 							// 대화방이 있을경우 isroomNum은 0이 아닌 이미 존재하는 룸번호이다
-							PrivateChat pc = new PrivateChat(this,isroomNum, nickName, otnickName);
+							PrivateChat pc = new PrivateChat(this, isroomNum, nickName, otnickName);
 							list = loginDao.prchatBring(isroomNum); // 대화내용 불러오기
-							prlist.add(pc);	
-							for(int i = 0; i < list.size();i++) {
+							prlist.add(pc);
+							for (int i = 0; i < list.size(); i++) {
 								String nickname = list.get(i).getNickname();
 								String message = list.get(i).getMsg();
 								pc.jta_display.append("[" + nickname + "]" + message + "\n");
 								pc.jta_display.setCaretPosition(pc.jta_display.getDocument().getLength());
 							}
 							System.out.println(list.size());
-						} 
+						}
 					} else {
 						chatView.errorMsg("상대방이 요청을 거절하였습니다.");
 					}
-					
-				} break;
-					
-				// 개인 채팅보내기	
+
+				}
+					break;
+
+				// 개인 채팅보내기
 				case Protocol.MESSAGE: {
 					String nickName = mvo.getNickname();
 					String message = mvo.getMsg();
-					int roomNum    =  mvo.getRoomNum();
-					for(PrivateChat prc : prlist) {
-						if(prc.getRoomNum() == roomNum) {
+					int roomNum = mvo.getRoomNum();
+					for (PrivateChat prc : prlist) {
+						if (prc.getRoomNum() == roomNum) {
 							prc.jta_display.append("[" + nickName + "]" + message + "\n");
 							prc.jta_display.setCaretPosition(prc.jta_display.getDocument().getLength());
 						}
@@ -116,7 +120,7 @@ public class TalkClientThread extends Thread {
 				// 채팅보내기 (프로토콜 201)
 				case Protocol.GROUP_MESSAGE: {
 					String nickName = mvo.getNickname();
-					String message =  mvo.getMsg();
+					String message = mvo.getMsg();
 					chatView.jta_display.append("[" + nickName + "]" + message + "\n");
 					chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
 				}
@@ -152,14 +156,14 @@ public class TalkClientThread extends Thread {
 				}
 					break;
 				// 개인 대화방 나감
-				case Protocol.PRROOM_OUT:{
+				case Protocol.PRROOM_OUT: {
 					int roomNum = mvo.getRoomNum();
-					String message = mvo.getMsg();
-					for(PrivateChat prc : prlist) {
-						if(prc.getRoomNum() == roomNum) {
-							prc.errorMsg(message);
-							prc.dispose();
-							prlist.remove(prc);
+					String message = mvo.getMsg(); // "~님이 퇴장하셨습니다"
+					for (PrivateChat pr : prlist) {
+						if (pr.getRoomNum() == roomNum) {
+							pr.errorMsg(message);
+							prlist.remove(pr);
+							pr.dispose();
 							break;
 						}
 					}
@@ -176,25 +180,35 @@ public class TalkClientThread extends Thread {
 						if (n.equals(nickName)) {
 							chatView.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
 						}
-					} 
-					
+					}
 				}
-					break;
+					break run_start; // 해당자원 반납
+
 				// 운영자에 의해 강제퇴장 당했을 경우
 				case Protocol.EXPULSION: {
-					String nickName = mvo.getNickname();
-					if (tc.nickName.equals(nickName)) { // 같은 닉네임이면 종료
-						chatView.successMsg("운영자에 의해 강퇴 당하셨습니다");
-						// 개인 대화방도 종료
-						if(prlist.size() != 0) {
-							for(PrivateChat pc : prlist) {
-								// 액션이벤트 수동으로 발생시키기( 열려있는 개인대화방 종료 수행 )
-								pc.actionPerformed(new ActionEvent(pc.jbtn_exit,ActionEvent.ACTION_PERFORMED,"openEvent"));
-							}
+					if (prlist.size() != 0) {
+						for (PrivateChat pc : prlist) {
+							String otnickName = pc.otNickName;
+							int roomnum = pc.getRoomNum();
+							tc.prRoomOut(otnickName, roomnum);
+							pc.dispose();
+						}	
+							tc.expulsion();
+						} else {
+							tc.expulsion();
 						}
+				} break;
+					
+				case Protocol.EXPULSION_RESPONSE:{
+					String nickName = mvo.getNickname();
+					msg = mvo.getMsg(); // ~님이 강퇴 당하셨습니다
+					// 같은 닉네임이면 종료
+					if (tc.nickName.equals(nickName)) {
+						chatView.successMsg("운영자에 의해 강퇴되었습니다");	
 						chatView.dispose();
+						break run_start;
 					} else { // 다른 닉네임이면 강퇴 당한 아이디 채팅창에 그리고 대화목록에서 삭제
-						chatView.jta_display.append(nickName + "님이 운영자에 의해 강퇴당하셨습니다.\n");
+						chatView.jta_display.append(msg + "\n");
 						chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
 						for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
 							String n = (String) chatView.dtm.getValueAt(i, 0);
@@ -202,15 +216,12 @@ public class TalkClientThread extends Thread {
 								chatView.dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
 							}
 						}
-
 					}
-
-				}
+				} break;
 
 				}//////////// end of switch
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} //////////////////// end of while
-	}
-}
+}}

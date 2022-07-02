@@ -122,17 +122,14 @@ public class SocketThread extends Thread implements Serializable {
 	
 	// 강퇴 이벤트 처리 ( 클라이언트에게 직접 말하기 )
 	public void expulsion(int select) {
-		String nickname = (String) view.dtm.getValueAt(select, 0);
+		String nickName = (String) view.dtm.getValueAt(select, 0);
 		for (TalkServerThread tst : globalList) {
-			if (nickname.equals(tst.nickName)) {
+			if (nickName.equals(tst.nickName)) {
 				MsgVO mvo = new MsgVO();
 				mvo.setProtocol(Protocol.EXPULSION);
-				mvo.setNickname(nickname);
-				tst.broadCasting(mvo); // 강퇴메시지
-				globalList.remove(tst);
+				tst.send(mvo);
 				view.dtm.removeRow(select);
-				view.jta_log.append(tst.nickName + "님을 강퇴하였습니다.\n");
-				userCount();		
+				view.jta_log.append(tst.nickName + "님을 강퇴하였습니다.\n");	
 				break; 
 				// for each중 객체를 수정하면 ConcurrentModificationException 발생. 그러므로 수정후 꼭 break문으로 빠져 나갈 것	
 			}
