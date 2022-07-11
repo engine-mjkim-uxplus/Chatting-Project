@@ -83,6 +83,59 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 ![image](https://user-images.githubusercontent.com/95892601/178216708-2f3de7d8-28ed-4629-ac90-629897d3b263.png)
 
 
+### 서버기능
+
+#### 1. 로그저장
+
+
+![image](https://user-images.githubusercontent.com/95892601/178218222-98b6ab70-ef1e-4483-8695-cf338d8ae976.png)
+
+
+>서버에서는 접속한 사용자들의 로그를 관리 할 수 있도록 로그를 txt파일 형식으로 저장할 수 있게 구현 하였습니다.
+
+##### <저장된 로그 저장 화면>
+
+
+![image](https://user-images.githubusercontent.com/95892601/178218569-10198cec-aaa0-488a-aa0a-469875e21373.png)
+
+#### 2. 공지사항 알림
+
+![image](https://user-images.githubusercontent.com/95892601/178218849-815f4cca-efd3-4258-a313-818e66dad927.png)
+
+
+> 서버에서 공지사항 알림을 클릭후 메시지를 입력하면 모든 클라이언트들에게 공지사항 메시지를 보냅니다.
+
+
+##### <공지사항 알림 결과 화면>
+
+
+![image](https://user-images.githubusercontent.com/95892601/178219059-14af50ec-2769-4793-99ca-f790298225ac.png)
+
+
+#### 3. 회원조회
+
+![image](https://user-images.githubusercontent.com/95892601/178219462-5b9758b2-35f5-4160-b844-aadcb7ef9c8d.png)
+
+
+>콤보박스에 아이디, 이름, 전화번호, 주소중 하나를 선택하여 해당하는 조건의 회원을 검색 및 조회할 수 있습니다..
+
+
+#### 4. 현재 접속자 및 강퇴처리
+
+![image](https://user-images.githubusercontent.com/95892601/178219708-d4340f7f-03e9-42e4-af99-bbf9a333dd81.png)
+
+
+>현재 접속자 버튼을 누르면 현재 접속한 인원의 ip 및 접속시간을 볼 수 있습니다.
+>또한 강퇴할 사용자를 선택 후 클라이언트 접속끊기 버튼을 누르면 해당 사용자는 "운영자에 의해 강퇴되었습니다"라는 메시지를 받고 접속이 종료 됩니다.
+
+
+##### <강퇴 처리 시 사용자 화면>
+
+
+![image](https://user-images.githubusercontent.com/95892601/178220009-4ebd38f6-754a-4bf5-b536-fdaef92af836.png)
+
+
+
 
 # Document
 
