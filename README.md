@@ -16,13 +16,15 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 ![image](https://user-images.githubusercontent.com/95892601/178211276-5a86ae48-e39d-46f5-a5f9-e7917aa1c163.png)
 
 ----------------------
+# Document
+----------------------
 
-## 공정표
+1.공정표
 ![image](https://user-images.githubusercontent.com/95892601/178211340-61e3afbb-749e-4bac-a3aa-60511ef0d812.png)
 
 ----------------------
 
-# 요구사항
+2.요구사항 정의서
 ![image](https://user-images.githubusercontent.com/95892601/178211438-6ffd5c3e-8883-4110-b857-ab11ec72cc72.png)
 
 ----------------------
