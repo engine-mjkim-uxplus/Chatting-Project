@@ -17,7 +17,6 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 
 ----------------------
 # Document
-----------------------
 
 1.공정표
 ![image](https://user-images.githubusercontent.com/95892601/178211340-61e3afbb-749e-4bac-a3aa-60511ef0d812.png)
@@ -28,3 +27,9 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 ![image](https://user-images.githubusercontent.com/95892601/178211438-6ffd5c3e-8883-4110-b857-ab11ec72cc72.png)
 
 ----------------------
+3. class 설계
+![image](https://user-images.githubusercontent.com/95892601/178212599-c37feb03-7b84-4aa9-8be9-2323ec38cee7.png)
+
+4. ERD 설계
+![image](https://user-images.githubusercontent.com/95892601/178212661-5ee5d99c-f5a5-4bad-bad8-3b8f0096760d.png)
+
