@@ -1,0 +1,52 @@
+CREATE TABLE MJ.MEMBER
+(
+  ID       VARCHAR2(50 BYTE)                    NOT NULL,
+  PW       VARCHAR2(50 BYTE)                    NOT NULL,
+  NAME     VARCHAR2(20 BYTE)                    NOT NULL,
+  PHONE    VARCHAR2(20 BYTE),
+  ADDRESS  VARCHAR2(60 BYTE)
+)
+TABLESPACE USERS
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+CREATE UNIQUE INDEX MJ.MEMBER_PK ON MJ.MEMBER
+(ID)
+LOGGING
+TABLESPACE USERS
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+NOPARALLEL;
+
+
+ALTER TABLE MJ.MEMBER ADD (
+  CONSTRAINT MEMBER_PK
+  PRIMARY KEY
+  (ID)
+  USING INDEX MJ.MEMBER_PK
+  ENABLE VALIDATE);
