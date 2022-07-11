@@ -103,7 +103,7 @@ public class TalkClient  {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		tct.isStop = true; // 쓰레드 종료되도록( ★자원 반납★ ) /////////테스트중
+		tct.isStop = true; // 쓰레드 종료되도록( ★자원 반납★ ) /////////테스트중
 	}
 	// 개인 대화방 퇴장 시
 	public void prRoomOut(String otnickName, int roomnum) {

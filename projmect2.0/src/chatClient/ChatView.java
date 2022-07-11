@@ -11,8 +11,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,10 +28,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-public class ChatView extends JFrame implements ActionListener, FocusListener {
+public class ChatView extends JFrame implements ActionListener, FocusListener, ItemListener {
 	private static final long serialVersionUID = 1L;
 	JTextField jtf_name = new JTextField("대화명을 입력하세요",20);
 	JButton jbtn_search = new JButton("찾기");
+	String comboicon[] = {"전체보기","닉네임으로 검색"};
+	JComboBox<String> jcb = new JComboBox<String>(comboicon);
+	Vector<String> userList = new Vector<>();
+	String selectName = null;
+	
 	JPanel jp_first 			=	new JPanel();
 	JPanel jp_first_south 		= 	new JPanel();
 	JPanel jp_first_east		= 	new JPanel();
@@ -37,7 +46,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	JPanel jp_second_south 		= 	new JPanel();
 	
 	JButton jbtn_whisper 		= 	new JButton("1:1대화 신청");
-	JButton jbtn_change 		= 	new JButton("회원수정");
+	JButton jbtn_change 		= 	new JButton("회원정보 수정");
 	JButton jbtn_exit 			= 	new JButton("나가기");
 	JButton jbtn_send 			= 	new JButton("전송");
 	JButton jbtn_emoticon 		= 	new JButton("이모티콘");
@@ -56,6 +65,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	JSplitPane jspp = new JSplitPane(SwingConstants.VERTICAL, jp_first,jp_second);
 	
 	
+	
 	// ChatView가 실행되면서 동시에 TalkClienThread가 생성되고
 	// run()메소드로 쓰레드가 실행됩니다.
 	public ChatView(String nickName) {
@@ -71,7 +81,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	
 	public void initDisplay(boolean is) {
 		/////////////////////////배경 이미지/////////////////////////////
-		back = getToolkit().getImage("C:\\java\\workspace_java\\이미지\\채팅창 배경.png");
+		back = getToolkit().getImage("./img/단체채팅 배경.png");
 		jta_display = new JTextArea() {
 			private static final long serialVersionUID = 1L;
 			
@@ -83,6 +93,7 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 			}
 		};
 		jp_second_north.setLayout(new BorderLayout());
+		jp_second_north.add("West",jcb);
 		jp_second_north.add("Center",jtf_name);
 		jp_second_north.add("East",jbtn_search);
 		
@@ -125,6 +136,8 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 		jbtn_exit.addActionListener(this);
 		jtf_name.addFocusListener(this);
 		jbtn_whisper.addActionListener(this);
+		jcb.addItemListener(this);
+		jbtn_search.addActionListener(this);
 	}
 
 	public String getMsg() {
@@ -142,8 +155,10 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	public int private_chat(String nickname) {
 		int result= JOptionPane.showConfirmDialog (this, nickname + "님이 대화를 신청하셨습니다","Invite", JOptionPane.YES_NO_OPTION);
 		 if(result == JOptionPane.YES_OPTION) {
+	            System.out.println("yes");
 	            result = 1;
 		 } else if(result == JOptionPane.NO_OPTION) {
+	              System.out.println("no");
 	              result = 0;
 	     }
 		 return result;
@@ -164,16 +179,11 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 		// ROOM_OUT
 		} else if (jbtn_exit == obj) {
 		tc.roomOut();
-		System.exit(0);
+		
+		dispose();
 		// NICKNAME_CHANGE
 		} else if (jbtn_change == obj) {
-			String afterName = JOptionPane.showInputDialog("변경할 대화명을 입력하세요.");
-			if (afterName == null || afterName.trim().length() < 1) {
-				errorMsg("변경할 대화명을 입력해주세요.");
-				return;
-			}else {
-				tc.changeNickName(afterName);
-			}
+			new ChangeView(this);
 		// ROOM_CREATE
 		} else if (jbtn_whisper == obj) { // 1대1 대화 신청
 			if(jtb.getSelectedRow() > -1) {
@@ -190,6 +200,27 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 					errorMsg("이미 대화중입니다");
 				}else 			 
 					errorMsg("대화상대를 선택해 주세요");
+		} else if (jbtn_search == obj) {
+			int count = 0;
+			String selectName = jtf_name.getText();
+			dtm.setRowCount(0);
+			jtf_name.setText("");
+			for (String name : userList) {
+				if (name.matches("(.*)"+selectName+"(.*)")) {
+					dtm.addRow(new String[]{name});
+				}else {
+					count++;
+				}
+			}
+			if (count == userList.size()) {
+				errorMsg("검색하신 닉네임은 존재하지 않습니다, 다시 검색해주세요");
+				jtf_name.setText("");
+				dtm.setRowCount(0);
+				for (String name : userList) {
+					dtm.addRow(new String[]{name});
+				}
+				count = 0;
+			}
 		}
 	}////////////////////// end of actionPerformed
 
@@ -204,5 +235,70 @@ public class ChatView extends JFrame implements ActionListener, FocusListener {
 	public void focusLost(FocusEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		Object obj = e.getSource();
+		if (obj == jcb) {
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				selectName = comboicon[jcb.getSelectedIndex()];
+//				System.out.println(selectName);
+				if (selectName.equals("전체보기")) {
+					dtm.setRowCount(0);
+					for (String name : userList) {
+						dtm.addRow(new String[]{name});
+					}
+					return;
+				}else if(selectName.equals("닉네임으로 검색")) {
+					jtf_name.setText("");
+				}
+			}
+		}
+		
+	}
+
+	public void addRow(String nickName) {
+		userList.add(nickName);
+		System.out.println("userList 추가 : "+userList);
+		dtm.addRow(new String[]{nickName}); /// 접속인원 보여주는 dtm에 닉네임 추가
+	}
+	
+	public void deleteRow(String nickName) {
+		String select = null;
+		for (String userName : userList) {
+			if (userName.equals(nickName)) {
+				select = userName;
+			}
+		}
+		userList.remove(select);
+		
+		System.out.println("몇명남았나 : "+userList);
+		for (int i = 0; i < dtm.getRowCount(); i++) {
+			String n = (String) dtm.getValueAt(i, 0);
+			if (n.equals(nickName)) {
+				dtm.removeRow(i); // 나가면 dtm(접속인원)에서 제거
+			}
+		}
+	}
+
+	public void changeNickName(String nickName) {
+		tc.changeNickName(nickName);
+		
+	}
+	
+	public void reFresh(String nickName,String afterName) { // userList = [백종국] -> [김종국]
+		// userList 대화면 변경
+		int count = 0; 
+		for (String userName : userList) {
+			if(nickName.equals(userName)) {
+				userList.set(count, afterName);
+				System.out.println("userList 바꿈 : "+ userList);
+			}else {
+				count++;
+			}
+		}
 	}
 }

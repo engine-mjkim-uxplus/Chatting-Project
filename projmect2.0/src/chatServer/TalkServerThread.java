@@ -202,11 +202,13 @@ public class TalkServerThread extends Thread {
 					sk.globalList.remove(this); // 클라이언트 나갔으므로 통신 쓰레드 지움
 					sk.showNumber_Conpeople();
 					sk.userCount(); // 접속인원 JTexField 초기화 
-				} break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료
+				}
+				break run_start; // 클라이언트 퇴장시 반복문 빠져나가면서 쓰레드 종료
 				}// end of switch
 			} // end of while
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}///////////////////////// end of run
+
 }

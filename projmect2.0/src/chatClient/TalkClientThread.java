@@ -43,9 +43,7 @@ public class TalkClientThread extends Thread {
 					String nickName = mvo.getNickname();
 					chatView.jta_display.append(nickName + "님이 입장하였습니다.\n");
 					System.out.println(nickName + "님이 입장하였습니다");
-					Vector<String> v = new Vector<>(); // 백터에 현재 접속한 닉네임을 담는다.
-					v.add(nickName);
-					chatView.dtm.addRow(v); /// 접속인원 보여주는 dtm에 닉네임 추가
+					chatView.addRow(nickName); /// 접속인원 보여주는 dtm에 닉네임 추가
 				}
 					break;
 
@@ -128,6 +126,9 @@ public class TalkClientThread extends Thread {
 					String nickName = mvo.getNickname();
 					String afterName = mvo.getAfter_nickname();
 					String message = mvo.getMsg();
+					
+					chatView.reFresh(nickName, afterName);
+					
 					// 테이블에 대화명 변경하기
 					for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
 						String imsi = (String) chatView.dtm.getValueAt(i, 0);
@@ -140,8 +141,11 @@ public class TalkClientThread extends Thread {
 					if (nickName.equals(tc.nickName)) {
 						chatView.setTitle(afterName + "님의 대화창");
 						chatView.nickName = afterName;
+						tc.nickName = afterName;
 					}
 					chatView.jta_display.append(message + "\n");
+					
+					
 				}
 					break;
 				// 서버에서 공지사항 보냄(프로토콜 203)
@@ -174,7 +178,7 @@ public class TalkClientThread extends Thread {
 					if(tc.nickName.equals(nickName)) {
 						break run_start; // 해당자원 반납
 					}
-					chatView.jta_display.append(msg+"/n");
+					chatView.jta_display.append(msg+"\n");
 					chatView.jta_display.setCaretPosition(chatView.jta_display.getDocument().getLength());
 					for (int i = 0; i < chatView.dtm.getRowCount(); i++) {
 						String n = (String) chatView.dtm.getValueAt(i, 0);
@@ -183,6 +187,7 @@ public class TalkClientThread extends Thread {
 						}
 					}
 				} break;
+
 				// 운영자에 의해 강제퇴장 당했을 경우
 				case Protocol.EXPULSION: {
 					if (prlist.size() != 0) {

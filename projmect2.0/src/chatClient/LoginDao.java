@@ -67,7 +67,7 @@ public class LoginDao {
 			pstmt.setString(1, pmVO.getMem_id());
 			rs = pstmt.executeQuery();
 			if (rs.next()) { // rs.next()가 true라는 것은 id가 있다는 것
-				result = rs.getString("IDCHECK"); // 아이디 중복이 있으면 1반환
+				result = rs.getString("IDCHECK"); // 아이디 중복이 있으면 -1반환
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -152,5 +152,143 @@ public class LoginDao {
 		}
 		return list;
 	}
+	
+	/******************************************************************
+	 * 회원정보 수정 구현
+	 * 
+	 * @param String name, pw - 사용자가 입력한 name, pw
+	 * @return int result - 0: 회원정보 수정 성공
+	 * 
+	 *UPDATE MEMBER SET NAME = '유리123', PW = '1234' WHERE ID = 'yuri'
+	 ******************************************************************/
+	// 회원정보 수정 메소드
+	public MemberVO editMember(MemberVO mVO) {
+		System.out.println("회원정보 수정 메소드 호출 성공");
+		String nickname = mVO.getMem_name();
+		String pw = mVO.getMem_pw();
+		String id = mVO.getMem_id();
+		int result = mVO.getResult();
+		String sql = null;
+		
+		if (result == 1) {
+			sql = "UPDATE MEMBER SET PW=? WHERE ID=?";
+		}
+		else if (result == 2) {
+			sql = "UPDATE MEMBER SET NAME=? WHERE ID=?";
+		}
+		else if (result == 3) {
+			sql = "UPDATE MEMBER SET NAME=?,PW=? WHERE ID=?";
+		}
 
+		con = DButil.getConnection();
+		
+		try {
+			pstmt = con.prepareStatement(sql);
+			
+			if (result == 1) {
+				pstmt.setString(1, pw);
+				pstmt.setString(2, id);
+			}
+			else if (result == 2) {
+				pstmt.setString(1, nickname);
+				pstmt.setString(2, id);
+			}
+			else if (result == 3) {
+				pstmt.setString(1, nickname);
+				pstmt.setString(2, pw);
+				pstmt.setString(3, id);
+			}
+			
+			int success = pstmt.executeUpdate();
+			System.out.println(success+"건 회원정보 수정 성공");
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+			System.out.println("회원정보 수정 실패");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("회원정보 수정 실패");
+		} finally {
+			DButil.close(con, pstmt);
+		}
+		return mVO;
+	}
+	
+	
+	/**********************************************************
+	 * 회원탈퇴하기
+	 * 
+	 * @param 
+	 * @return
+	 * 
+	 * DELETE FROM MEMBER WHERE id = ?
+	 **********************************************************/
+	// 회원탈퇴 메소드
+	public MemberVO withdrawal(MemberVO pmVO) {
+		System.out.println("회원탈퇴 메소드 호출 성공");
+		String sql ="DELETE FROM MEMBER	WHERE ID = ?";
+		String id = pmVO.getMem_id();
+		con = DButil.getConnection();
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.executeUpdate();
+			pmVO.setResult(1);
+			System.out.println("탈퇴 성공");
+		} catch (SQLException se) {
+			pmVO.setResult(-1);
+			se.printStackTrace();
+			System.out.println("회원 탈퇴 실패");
+		} catch (Exception e) {
+			pmVO.setResult(-1);
+			e.printStackTrace();
+			System.out.println("회원 탈퇴 실패");
+		} finally {
+			DButil.close(con,pstmt);
+		}
+		return pmVO;
+	}
+	
+	/**********************************************************
+	 * 닉네임 값으로 아이디,비밀번호를 가져오는 메소드
+	 * @param mVO
+	 * @return 
+	 **********************************************************/
+	public MemberVO memberCheck(MemberVO mVO) {
+		String nickName = mVO.getMem_name();
+		String sql = "SELECT ID,PW FROM MEMBER WHERE NAME = ?";
+		
+		con = DButil.getConnection();
+		try {
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, nickName);
+			rs = pstmt.executeQuery();
+			if (rs.next()) { 
+				String id = rs.getString("ID");
+				String pw = rs.getString("PW");
+				mVO.setMem_id(id);
+				mVO.setMem_pw(pw);
+				mVO.setResult(1); // 성공시 1
+			}else {
+				mVO.setResult(-1); // 실패시 -1
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DButil.close(con, pstmt, rs); // 닫기
+		}
+		
+		return mVO;
+	}
+
+//	public static void main(String[] args) {
+//		LoginDao ld = new LoginDao();
+//		MemberVO vo = new MemberVO();
+//		vo.setMem_id("test");
+//		vo.setResult(3);
+//		vo.setMem_pw("1234");
+//		vo.setMem_name("종국");
+//		ld.editMember(vo);
+//	}
+	
 }
