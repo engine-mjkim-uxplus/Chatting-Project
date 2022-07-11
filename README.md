@@ -39,7 +39,7 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 >로그인 후 단체대화방으로 입장하여 모든 사용자의 대화내용을 볼 수 있는 단체톡방 구현
 
 
-#### 3. 1대1 대화
+#### 3.1대1 대화
 
 
 ![image](https://user-images.githubusercontent.com/95892601/178214162-b2fb082e-e15d-4682-925f-0132201eb5fc.png)
@@ -85,7 +85,7 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 
 ### 서버기능
 
-#### 1. 로그저장
+#### 1.로그저장
 
 
 ![image](https://user-images.githubusercontent.com/95892601/178218222-98b6ab70-ef1e-4483-8695-cf338d8ae976.png)
@@ -98,7 +98,7 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 
 ![image](https://user-images.githubusercontent.com/95892601/178218569-10198cec-aaa0-488a-aa0a-469875e21373.png)
 
-#### 2. 공지사항 알림
+#### 2.공지사항 알림
 
 ![image](https://user-images.githubusercontent.com/95892601/178218849-815f4cca-efd3-4258-a313-818e66dad927.png)
 
@@ -112,7 +112,7 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 ![image](https://user-images.githubusercontent.com/95892601/178219059-14af50ec-2769-4793-99ca-f790298225ac.png)
 
 
-#### 3. 회원조회
+#### 3.회원조회
 
 ![image](https://user-images.githubusercontent.com/95892601/178219462-5b9758b2-35f5-4160-b844-aadcb7ef9c8d.png)
 
@@ -120,7 +120,7 @@ UI는 자바 swing을 이용하여 구현하였고 데이터베이스는 오라�
 >콤보박스에 아이디, 이름, 전화번호, 주소중 하나를 선택하여 해당하는 조건의 회원을 검색 및 조회할 수 있습니다..
 
 
-#### 4. 현재 접속자 및 강퇴처리
+#### 4.현재 접속자 및 강퇴처리
 
 ![image](https://user-images.githubusercontent.com/95892601/178219708-d4340f7f-03e9-42e4-af99-bbf9a333dd81.png)
 
