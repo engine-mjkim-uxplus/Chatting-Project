@@ -1,9 +1,9 @@
 # 자바 소켓통신을 이용한 채팅프로그램 개발
 ----------------------
 
-## 시연영상
+## <img width="30" height="30" src="https://user-images.githubusercontent.com/95892601/204138950-40ec2ebd-fb00-4e3b-b3db-75ba7fe8f156.png">시연영상
 <ul>
-  <li><a href="https://www.youtube.com/watch?v=ZL1rfqkIQOM">시연영상 바로가기</a></li>
+  <li>🎥<a href="https://www.youtube.com/watch?v=ZL1rfqkIQOM">시연영상 바로가기</a></li>
 </ul>
 
 ![채팅창 로그인 화면](https://user-images.githubusercontent.com/95892601/178210184-d00d07aa-1525-4713-91f1-b18a97913333.png)
