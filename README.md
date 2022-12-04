@@ -3,7 +3,7 @@
 
 ## 시연영상
 <ul>
-  <li><a href="https://www.youtube.com/watch?v=ZL1rfqkIQOM"></a></li>
+  <li><a href="https://www.youtube.com/watch?v=ZL1rfqkIQOM">시연영상 </a></li>
 </ul>
 
 ![채팅창 로그인 화면](https://user-images.githubusercontent.com/95892601/178210184-d00d07aa-1525-4713-91f1-b18a97913333.png)
